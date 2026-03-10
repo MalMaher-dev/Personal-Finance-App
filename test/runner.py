@@ -21,15 +21,6 @@ def verify_account(fname, lname):
         return False
 
 
-
-# def doSomething(event):
-#     print("You just pressed " + event.keysym)
-#
-# print("Press 'q' key to continue...")
-# window.bind("<Key>", doSomething)
-#
-# window.mainloop()
-
 while session == "active":
     while not success:
         # new_account = account.Account("Jane", "Doe", 100)
@@ -39,13 +30,3 @@ while session == "active":
         else:
             print("New account has been made")
             success = True
-
-# for num in range(10):
-#     t = transaction.Transaction("spend", num, "Amazon.com")
-# t.write_to_file()
-#
-#
-# # new_account.write_to_file()
-#
-# print("Function was Successful")
-# print(new_account.balance)
