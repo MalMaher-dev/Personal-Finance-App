@@ -1,9 +1,12 @@
-dateCreated,action,amount,retailer
-Tue Feb  3 14:36:11 2026,spend,0,Amazon.com
-Tue Feb  3 14:36:11 2026,spend,1,Amazon.com
-Tue Feb  3 14:36:11 2026,spend,2,Amazon.com
-Tue Feb  3 14:36:11 2026,spend,3,Amazon.com
-Tue Feb  3 14:36:11 2026,spend,4,Amazon.com
-Tue Feb  3 14:36:11 2026,spend,5,Amazon.com
-Tue Feb  3 14:36:11 2026,spend,6,Amazon.com
-Tue Feb  3 14:36:11 2026,spend,7,Amazon.comMon Mar  9 00:48:00 2026,spend,9,Amazon.com
+dateCreated,transaction_id,amount,retailer
+03/10/26,1,9543,Amazon.com
+03/10/26,2,2505,Amazon.com
+03/10/26,3,9102,Amazon.com
+03/10/26,4,7564,Amazon.com
+03/10/26,5,2935,Amazon.com
+03/10/26,6,4876,Amazon.com
+03/10/26,7,5206,Amazon.com
+03/10/26,8,8061,Amazon.com
+03/10/26,9,7107,Amazon.com
+03/10/26,10,7865,Amazon.com
+

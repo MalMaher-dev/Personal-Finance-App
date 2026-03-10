@@ -8,3 +8,4 @@ class Graphing:
         self.data = data
         
     def graph(self, x_axis, y_axis):
+        pass
