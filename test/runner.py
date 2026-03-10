@@ -32,7 +32,7 @@ def verify_account(fname, lname):
 
 while session == "active":
     while not success:
-        # new_account = account.Account("Mallory", "Maher", 100)
+        # new_account = account.Account("Jane", "Doe", 100)
         fName, lName = input("Please input your first and last name: ").split()
         if verify_account(fName, lName):
             print("This name is already in use, please login or try a different name")
