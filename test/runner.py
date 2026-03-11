@@ -27,6 +27,14 @@ def edit_transaction():
                         line_split[3] = retailer
 
 
+def view_transactions():
+    transactions = []
+    with open("../Data/transaction_data.csv", "r") as myFile:
+        for line in myFile:
+            transactions.append(line)
+    return transactions
+
+
 def verify_account(fname, lname):
     with open("../Data/account_data.csv", "r") as myFile:
         for line in myFile:
@@ -38,6 +46,7 @@ def verify_account(fname, lname):
             if new_name == registered_name:
                 return True
         return False
+
 
 #
 # while session == "active":
@@ -52,11 +61,34 @@ def verify_account(fname, lname):
 
 
 # for num in range(10):
-#     t = transaction.Transaction(random.randint(1, 9999), "Amazon.com")
-#     t.write_to_file()
+#     for i in range(2):
+#         t = transaction.Transaction(i,random.randint(1, 9999), "Amazon.com")
+#         t.write_to_file()
+
+def sortByAccount():
+    # account_id = Text(window, width=20, height=1)
+    # account_id.pack()
+    transactions = view_transactions()
+    sorted_transactions1 = []
+    sorted_transactions2 = []
+    for i in range(len(transactions)):
+        line_split = transactions[i].split(",")
+        if line_split[1] == '0':
+            print(line_split)
+
+    # for t in range(len(transactions)):
+    #     line_split = transactions[t].split(',')
+    #     if (int)(line_split[1]) == 0:
+    #         sorted_transactions1.append(transactions[t])
+    #     else:
+    #         sorted_transactions2.append(transactions[t])
+    # for i in range(len(sorted_transactions2)):
+    #     sorted_transactions1.append(sorted_transactions2[i])
+
+sortByAccount()
 
 
-edit_transaction()
+# print(view_transactions())
 
 # new_account.write_to_file()
 #
