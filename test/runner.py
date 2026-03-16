@@ -1,4 +1,7 @@
 import random
+import time
+import csv
+import pandas
 
 from Objects import transaction as transaction
 import Objects.account as account
@@ -59,11 +62,50 @@ def verify_account(fname, lname):
 #             print("New account has been made")
 #             success = True
 
-
+# retailers = ["Amazon", "Walmart", "Ebay", "Target"]
+#
 # for num in range(10):
 #     for i in range(2):
-#         t = transaction.Transaction(i,random.randint(1, 9999), "Amazon.com")
+#         t = transaction.Transaction(i, random.randint(1, 9999), retailers[random.randint(0, len(retailers) - 1)])
 #         t.write_to_file()
+
+def totalExpenses(account_id):
+    total = 0
+    expenses = []
+    with open("../Data/transaction_data.csv") as myFile:
+        reader = csv.reader(myFile)
+        for line in reader:
+            if line[1] == str(account_id):
+                expenses.append(line)
+                total += int(line[3])
+    return total, len(expenses)
+
+
+def totalExpensesAmount(account_id, amount):  # Expenses by amount
+    total = 0
+    expenses = []
+    with open("../Data/transaction_data.csv") as myFile:
+        reader = csv.reader(myFile)
+        for line in reader:
+            if line[1] == str(account_id):
+                if line[3] >= str(amount):
+                    expenses.append(line)
+                    total += int(line[3])
+    return total, len(expenses)
+
+
+def totalExpensesRetailer(account_id, retailer):  # Expenses by retailer
+    total = 0
+    expenses = []
+    with open("../Data/transaction_data.csv") as myFile:
+        reader = csv.reader(myFile)
+        for line in reader:
+            if line[1] == str(account_id):
+                if line[4] == retailer:
+                    expenses.append(line)
+                    total += int(line[3])
+    return total, len(expenses)
+
 
 def sortByAccount():
     # account_id = Text(window, width=20, height=1)
@@ -85,8 +127,70 @@ def sortByAccount():
     # for i in range(len(sorted_transactions2)):
     #     sorted_transactions1.append(sorted_transactions2[i])
 
-sortByAccount()
 
+# sortByAccount()
+def createAccount():
+    first, last = input("Please enter your first and last name respectively: ").split()
+    username = input("Enter your username: ")
+    password = input("Enter your password: ")
+    balance = input("Enter your balance: ")
+    verify = input(f"Is this information correct? {first}, {last}, {username}, {password}, {balance} (yes or no): ")
+    if verify == "yes":
+        if verify_account(first, last):
+            print("Sorry these credentials are already registered, please try again ")
+            for i in range(5):
+                print(". ")
+                time.sleep(0.5)
+            createAccount()
+        else:
+            new_account = account.Account(first, last, username, password, balance)
+            new_account.write_to_file()
+            print("Account successfully created")
+
+
+def countTransactionsByRetailer(account_id):
+    Amazon = []
+    spentOnAmazon = 0
+    Target = []
+    spentOnTarget = 0
+    Walmart = []
+    spentOnWalmart = 0
+    Ebay = []
+    spentOnEbay = 0
+    transactions = 0
+    with open("../Data/transaction_data.csv") as myFile:
+        reader = csv.reader(myFile)
+        for line in reader:
+            if line[1] == str(account_id):
+                match line[4]:
+                    case "Amazon":
+                        Amazon.append(line)
+                        spentOnAmazon += int(line[3])
+                    case "Target":
+                        Target.append(line)
+                        spentOnTarget += int(line[3])
+                    case "Walmart":
+                        Walmart.append(line)
+                        spentOnWalmart += int(line[3])
+                    case "Ebay":
+                        Ebay.append(line)
+                        spentOnEbay += int(line[3])
+    print(f"Your transactions sorted by retailer: "
+          f"Amazon (Amount of transaction: {len(Amazon)}, Amount Spent: {spentOnAmazon}),\n"
+          f"Target (Amount of transaction: {len(Target)}, Amount Spent: {spentOnTarget}),\n"
+          f"Walmart (Amount of transactions: {len(Walmart)}, Amount Spent: {spentOnWalmart}),\n"
+          f"Ebay (Amount of transactions: {len(Ebay)},Amount Spent: {spentOnEbay}),\n"
+          f"Total transactions: {len(Amazon) + len(Target) + len(Walmart) + len(Ebay)}\n"
+          f"Total cost: ${spentOnAmazon + spentOnTarget + spentOnWalmart + spentOnEbay}")
+
+
+# createAccount()
+# print(totalExpenses(0)) # Works
+# print(totalExpensesAmount(0, 9000)) # Works
+# print(totalExpensesRetailer(0, "Walmart"))
+# print(totalExpenses(1))
+countTransactionsByRetailer(0)
+# sortByAccount()
 
 # print(view_transactions())
 
