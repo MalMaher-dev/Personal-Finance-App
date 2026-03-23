@@ -1,7 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 import re
+
 from Objects import transaction as transaction
+from DB.connection import *
 
 GEOMETRY_DEFAULT = "800x600"
 
@@ -35,10 +37,6 @@ def sortByAccount():
         sorted_transactions1.append(sorted_transactions2[i])
     return sorted_transactions1
 
-def submit():
-    print("Information submitted, please wait for verification")
-    # Make Logic to compare to registered accounts
-
 
 def getCurrentGeometry():
     wGeo = re.split(r'[x,+]', window.geometry())
@@ -71,29 +69,37 @@ password.pack()
 
 content = ttk.Frame(window)
 
+
 # Buttons
 
-# button = Button(window, text="Submit", command=submit)
-# button.pack(pady=20)
+
+def submit():
+    uName = username.get("1.0", END).strip()
+    pWord = password.get("1.0", END).strip()
+    print(f"Information submitted, please wait for verification {uName} and password {pWord}")
+    # Make Logic to compare to registered accounts
 
 
-View_button = ttk.Button(window, text="View Transactions", command=view_transactions)
-View_button.pack()
+button = Button(window, text="Submit", command=submit)
+button.pack(pady=20)
 
-Sort_button = ttk.Button(window, text="Sort by account", command=sortByAccount)
-Sort_button.pack()
+# View_button = ttk.Button(window, text="View Transactions", command=view_transactions)
+# View_button.pack()
+#
+# Sort_button = ttk.Button(window, text="Sort by account", command=sortByAccount)
+# Sort_button.pack()
 
 
-transactions = view_transactions()
-transvar = StringVar(value=transactions)
-
-viewer = Listbox(window, listvariable=transvar, height=3, width=50)
-viewer.pack()
-
-transactions2 = sortByAccount()
-Stransvar = StringVar(value=transactions)
-
-Sviewer = Listbox(window, listvariable=transvar, height=3, width=50)
-Sviewer.pack()
+# transactions = view_transactions()
+# transvar = StringVar(value=transactions)
+#
+# viewer = Listbox(window, listvariable=transvar, height=3, width=50)
+# viewer.pack()
+#
+# transactions2 = sortByAccount()
+# Stransvar = StringVar(value=transactions)
+#
+# Sviewer = Listbox(window, listvariable=transvar, height=3, width=50)
+# Sviewer.pack()
 
 window.mainloop()
