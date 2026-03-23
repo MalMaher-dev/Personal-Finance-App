@@ -4,35 +4,61 @@ import time
 import mysql.connector
 from mysql.connector import Error
 
-mydb = mysql.connector.connect(
-    host="127.0.0.1",
-    port="3307",
-    user="guest",
-    password="pssswrd",
-    database="project",
-    autocommit=True
-)
 
-try:
+def connectToMySQL():
+    database = mysql.connector.connect(
+        host="127.0.0.1",
+        port="3307",
+        user="guest",
+        password="pssswrd",
+        database="project",
+        autocommit=True
+    )
+    return database
+
+
+mydb = connectToMySQL()
+
+
+def CheckConnection():
     if mydb.is_connected():
-        print("Connection Successful")
+        print("Connection successful")
     else:
-        print("Connection Failed")
-except Error as e:
-    print(f"Error: {e}")
+        print("Connection failed")
+
 
 mycursor = mydb.cursor()
 
-mycursor.execute("SELECT * FROM accountinfo;")
 
-myresult = mycursor.fetchall()
-accounts = []
+def verifyAccount(username, password):
+    mycursor.execute(f"SELECT * FROM accountinfo WHERE username='{username}'")
+    result = mycursor.fetchall()
+    if result == []:
+        return False
+    else:
+        if result[0][5] == password:
+            return True
+        else:
+            return False
 
-for x in myresult:
-    accounts.append(x[3])
-    print(x)
 
-retailers = ["Amazon", "Calvin Klein", "Target", "Walmart", "Costco"]
+def getAccount(username):
+    mycursor.execute(f"SELECT * FROM accountinfo WHERE username='{username}'")
+    result = mycursor.fetchall()
+    return result
+
+
+def viewAllAccounts(mycursor):
+    accounts = []
+    mycursor.execute("SELECT * FROM accounts")
+    result = mycursor.fetchall()
+    for index in result:
+        accounts.append(index[3])
+    return accounts
+
+
+# retailers = ["Amazon", "Calvin Klein", "Target", "Walmart", "Costco"]
+
 
 # for x in range(10):
 #     mycursor.execute(f"INSERT INTO transactions (accountNumber,amount,retailer)"
@@ -49,9 +75,12 @@ retailers = ["Amazon", "Calvin Klein", "Target", "Walmart", "Costco"]
 
 
 def sortByAccount(accountNumber):
+    transactions = []
     mycursor.execute(f"SELECT * FROM transactions WHERE accountNumber='{accountNumber}'")
     result = mycursor.fetchall()
-    return result
+    for index in result:
+        transactions.append(index)
+    return transactions
 
 
 def sortByRetailer(retailer):
@@ -64,10 +93,6 @@ def greaterThanAverage():
     mycursor.execute("SELECT * FROM transactions"
                      " WHERE amount >= (SELECT AVG(amount) FROM transactions)"
                      " ORDER BY amount ASC;")
-
-
-
-
 
 #
 # mycursor.execute("SELECT * FROM transactions"

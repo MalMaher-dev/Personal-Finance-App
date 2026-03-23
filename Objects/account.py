@@ -17,3 +17,7 @@ class Account:
             line = (f"{self.first_name},{self.last_name},{self.username},{self.password},"
                     f"{self.account_number},{self.balance},{self.dateCreated}")
             myFile.write(line + "\n")
+
+    def toString(self):
+        return (f"{self.first_name},{self.last_name},{self.username},{self.password},"
+                f" {self.account_number},{self.balance},{self.dateCreated}")
