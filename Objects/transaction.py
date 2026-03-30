@@ -3,25 +3,13 @@ import random
 
 
 class Transaction:
-    count = 0
 
-    with open("../Data/transaction_data.csv", "r") as myFile:
-        for line in myFile:
-            count += 1
-
-    def __init__(self, account_id, amount, retailer):
+    def __init__(self, account_id, trans_id, amount, retailer):
         self.dateCreated = datetime.datetime.now().strftime("%x")
         self.account_id = account_id
         self.amount = amount
         self.retailer = retailer
-        self.transaction_id = Transaction.count
-        Transaction.count += 1
-
-    def write_to_file(self):
-        with open("../Data/transaction_data.csv", "a") as myFile:
-            line = f"{self.dateCreated},{self.account_id},{self.transaction_id},{self.amount},{self.retailer}"
-            myFile.write(line + "\n")
-
+        self.transaction_id = trans_id
     # def edit_transaction(self, transaction_id):
     #     with open("../Data/transaction_data.csv", "r") as myFile:
     #         for line in len(myFile):

@@ -62,7 +62,9 @@ def getTransactions(num):
     mycursor.execute(f"SELECT * FROM transactions WHERE accountNumber = {num}")
     result = mycursor.fetchall()
     for index in result:
-        transactions.append(index)
+        dataline = f"{index[2]}, {index[4]}, {index[3]}, {index[0]}"
+        transactions.append(dataline)
+        print(index)
     return transactions
 
 

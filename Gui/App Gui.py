@@ -71,10 +71,11 @@ def submit():
     print(f"Information submitted, please wait for verification {uName} and password {pWord}")
     if connection.verifyAccount(uName, pWord):
         result = connection.getAccount(uName)
-        user = account.Account(result[0][0], result[0][1], result[0][4], result[0][5], result[0][3])
+        # print(result)
+        user = account.Account(result[0][0], result[0][1], result[0][4], result[0][5], result[0][2], result[0][3])
         print("Welcome, give us a moment to adjust somethings")
         print(user.toString())
-        print(getSessionTime(), " seconds")
+        # print(getSessionTime(), " seconds")
         cleanLogin()
         renderHomeScreen(user)
     else:
@@ -99,34 +100,30 @@ def cleanLogin():
 
 
 def renderHomeScreen(user):
-    user_label = ttk.Label(window, text=f"Hello {user.first_name}")
-    user_label.grid(row=0, column=0)
-
-    View_button = ttk.Button(window, text="View Transactions", command=lambda: displayTransactions(user.account_number))
-    View_button.grid(row=0, column=1, columnspan=2)
+    user_label = ttk.Label(window, text=f"Hello {user.first_name}", font=("Arial", 14))
+    user_label.grid(row=0, column=0, columnspan=2, rowspan=2, padx=60, pady=25)
 
 
-# def displayTransactions():
-#     transactionList = []
-#     transactions = view_transactions()
-#     transvar = StringVar(value=transactions)
-#
-#     viewer = Listbox(window, listvariable=transvar, height=3, width=50)
-#     viewer.pack()
-#
-#
-# Sort_button = ttk.Button(window, text="Sort by account", command=sortByAccount)
-# Sort_button.pack()
+
+    # for row in range(7):
+    #     for col in range(10):
+    #         Button(
+    #             window,
+    #             text=f"Cell ({row}, {col})",
+    #             width=10,
+    #             height=5,
+    #         ).grid(row=row, column=col)
+
+    # View_button = ttk.Button(window, text="View Transactions",
+    #                          command=lambda: displayTransactions(int(user.account_number)))
+    # View_button.grid(row=0, column=1, columnspan=2)
+
 
 def displayTransactions(num):
-
-    pass
-    # Works
-    # transactions = connection.getTransactions(9521)
-    # Stransvar = StringVar(value=transactions)
-    # Sviewer = Listbox(window, listvariable=Stransvar, height=5, width=50)
-    # Sviewer.grid(row=1, column=1, rowspan=3)
-    # Sviewer.pack()
+    transactions = connection.getTransactions(num)
+    Stransvar = StringVar(value=transactions)
+    Sviewer = Listbox(window, listvariable=Stransvar, height=5, width=50)
+    Sviewer.grid(row=1, column=1, rowspan=3, columnspan=3)
 
 
 def getSessionTime():
