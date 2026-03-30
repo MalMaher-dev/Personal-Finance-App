@@ -1,3 +1,4 @@
+import csv
 from tkinter import *
 from tkinter import ttk
 import re
@@ -9,10 +10,11 @@ import DB.connection as connection
 GEOMETRY_DEFAULT = "800x600"
 
 
+#
 # def sortByAccount():
 #     # account_id = Text(window, width=20, height=1)
 #     # account_id.pack()
-#     transactions = view_transactions()
+#     transactions = connection.getTransactions(9521)
 #     sorted_transactions1 = []
 #     sorted_transactions2 = []
 #     for t in range(len(transactions)):
@@ -74,7 +76,7 @@ def submit():
         print(user.toString())
         print(getSessionTime(), " seconds")
         cleanLogin()
-        # renderHomeScreen()
+        renderHomeScreen(user)
     else:
         print("Account not found, please try again")
 
@@ -82,10 +84,8 @@ def submit():
 submit_button = Button(window, text="Submit", command=submit)
 submit_button.pack(pady=20)
 
-
-#
-# check_button = Button(window, text="Check Connection", command=connection.CheckConnection)
-# check_button.pack(pady=20)
+check_button = Button(window, text="Check Connection", command=connection.CheckConnection)
+check_button.pack(pady=20)
 
 
 def cleanLogin():
@@ -95,43 +95,46 @@ def cleanLogin():
     username.forget()
     password.forget()
     submit_button.forget()
-    # check_button.forget()
+    check_button.forget()
 
 
-def renderHomeScreen():
-    View_button = ttk.Button(window, text="View Transactions", command=connection)
-    View_button.pack(side="left")
+def renderHomeScreen(user):
+    user_label = ttk.Label(window, text=f"Hello {user.first_name}")
+    user_label.grid(row=0, column=0)
+
+    View_button = ttk.Button(window, text="View Transactions", command=lambda: displayTransactions(user.account_number))
+    View_button.grid(row=0, column=1, columnspan=2)
 
 
+# def displayTransactions():
+#     transactionList = []
+#     transactions = view_transactions()
+#     transvar = StringVar(value=transactions)
+#
+#     viewer = Listbox(window, listvariable=transvar, height=3, width=50)
+#     viewer.pack()
+#
 #
 # Sort_button = ttk.Button(window, text="Sort by account", command=sortByAccount)
 # Sort_button.pack()
 
+def displayTransactions(num):
 
-# transactions = view_transactions()
-# transvar = StringVar(value=transactions)
-#
-# viewer = Listbox(window, listvariable=transvar, height=3, width=50)
-# viewer.pack()
-#
-# transactions2 = sortByAccount()
-# Stransvar = StringVar(value=transactions)
-#
-# Sviewer = Listbox(window, listvariable=transvar, height=3, width=50)
-# Sviewer.pack()
-
-
-def endTime():
-    return time.time()
+    pass
+    # Works
+    # transactions = connection.getTransactions(9521)
+    # Stransvar = StringVar(value=transactions)
+    # Sviewer = Listbox(window, listvariable=Stransvar, height=5, width=50)
+    # Sviewer.grid(row=1, column=1, rowspan=3)
+    # Sviewer.pack()
 
 
 def getSessionTime():
-    return round(endTime() - startTime, 3)
+    return round(time.time() - startTime, 2)
 
 
 # Session tracker
 
 startTime = time.time()
-
 
 window.mainloop()

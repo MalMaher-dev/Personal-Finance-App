@@ -10,7 +10,7 @@ def connectToMySQL():
         host="127.0.0.1",
         port="3307",
         user="guest",
-        password="pssswrd",
+        password="psssword",
         database="project",
         autocommit=True
     )
@@ -57,6 +57,15 @@ def viewAllAccounts(mycursor):
     return accounts
 
 
+def getTransactions(num):
+    transactions = []
+    mycursor.execute(f"SELECT * FROM transactions WHERE accountNumber = {num}")
+    result = mycursor.fetchall()
+    for index in result:
+        transactions.append(index)
+    return transactions
+
+
 # retailers = ["Amazon", "Calvin Klein", "Target", "Walmart", "Costco"]
 
 
@@ -93,6 +102,7 @@ def greaterThanAverage():
     mycursor.execute("SELECT * FROM transactions"
                      " WHERE amount >= (SELECT AVG(amount) FROM transactions)"
                      " ORDER BY amount ASC;")
+
 
 #
 # mycursor.execute("SELECT * FROM transactions"
