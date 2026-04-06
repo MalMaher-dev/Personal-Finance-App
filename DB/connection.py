@@ -62,27 +62,35 @@ def getTransactions(num):
     mycursor.execute(f"SELECT * FROM transactions WHERE accountNumber = {num}")
     result = mycursor.fetchall()
     for index in result:
-        dataline = f"{index[2]}, {index[4]}, {index[3]}, {index[0]}"
+        dataline = f"{index[4]}, {index[3]}, {index[0].strftime('%x')}"
         transactions.append(dataline)
-        print(index)
+        # print(index)
     return transactions
 
 
-# retailers = ["Amazon", "Calvin Klein", "Target", "Walmart", "Costco"]
+def autoGenTransactions():
+    accounts = []
+    mycursor.execute("SELECT accountNumber FROM accountinfo")
+    result = mycursor.fetchall()
+    for i in result:
+        accounts.append(i[0])
+    retailers = ["Amazon", "Calvin Klein", "Target", "Walmart", "Costco"]
+    for x in range(10):
+        account = accounts[random.randint(0, len(accounts) - 1)]
+        mycursor.execute(f"INSERT INTO transactions (accountNumber,amount,retailer)"
+                         f" VALUES ('{account}',"
+                         f" '{random.random() * random.randint(1, 100)}', "
+                         f" '{retailers[random.randint(0, len(retailers) - 1)]}');")
+    mydb.commit()
+    print("Transactions generated")
 
 
-# for x in range(10):
-#     mycursor.execute(f"INSERT INTO transactions (accountNumber,amount,retailer)"
-#                      f" VALUES ('{accounts[random.randint(0, len(accounts) - 1)]}',"
-#                      f" '{random.random() * random.randint(1, 100)}', "
-#                      f" '{retailers[random.randint(0, len(retailers) - 1)]}');")
+def addAccount():  # Add accounts to account table
+    mycursor.execute("INSERT INTO accountinfo(")
 
-# def addAccount(): # Add accounts to account table
-#     mycursor.execute("INSERT INTO accountinfo(")
-
-# mycursor.execute("INSERT INTO accountinfo(firstName,lastName,balance,accountNumber,username,password)"
-#                  "VALUES ('Dayton','Dawson',0,1122,'dDawson','Daytond');")
-# mydb.commit()
+    mycursor.execute("INSERT INTO accountinfo(firstName,lastName,balance,accountNumber,username,password)"
+                     "VALUES ('Dayton','Dawson',0,1122,'dDawson','Daytond');")
+    mydb.commit()
 
 
 def sortByAccount(accountNumber):
@@ -104,7 +112,6 @@ def greaterThanAverage():
     mycursor.execute("SELECT * FROM transactions"
                      " WHERE amount >= (SELECT AVG(amount) FROM transactions)"
                      " ORDER BY amount ASC;")
-
 
 #
 # mycursor.execute("SELECT * FROM transactions"
