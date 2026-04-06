@@ -41,7 +41,7 @@ def getCurrentGeometry():
 
 def register():
     cleanLogin()
-    register_button.forget()
+    # register_button.forget()
     global username, password, firstName, lastName
 
     user_label = ttk.Label(window, text="Enter a Username")
@@ -169,17 +169,17 @@ def renderHomeScreen(user):
     add_transaction = ttk.Button(window, text="Add Transaction", command=connection.autoGenTransactions)
     add_transaction.grid(row=3, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10)
 
-    sort_transactions = ttk.Button(window, text="Sort Transactions", command=lambda: print("Sort works"))
+    sort_transactions = ttk.Button(window, text="Sort Transactions", command=lambda: sorter(user.account_number))
     sort_transactions.grid(row=6, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=30)
 
     chart_transaction = ttk.Button(window, text="Chart Transaction", command=lambda: print("Chart works"))
-    chart_transaction.grid(row=9, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=50)
+    chart_transaction.grid(row=10, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=50)
 
     transaction_history = ttk.Button(window, text="Transaction History",
-                                     command=lambda: displayTransactions(user.account_number))
+                                     command=lambda: displayTransactions(user.account_number,"show"))
     transaction_history.grid(row=3, column=5, columnspan=2, ipadx=145, ipady=10, padx=30)
 
-    chron_sort = ttk.Button(window, text="Most recent", command=lambda: print("Most Recent"))
+    chron_sort = ttk.Button(window, text="Oldest to Newest", command=lambda: print("Old - New"))
     chron_sort.grid(row=4, column=5, ipadx=50)
 
     balance_label = ttk.Label(window, text=f"Balance: ${user.balance}", font=("Arial", 10), justify=CENTER)
@@ -200,19 +200,52 @@ def renderHomeScreen(user):
     # View_button.grid(row=0, column=1, columnspan=2)
 
 
-def displayTransactions(num):
+def displayTransactions(num, action):
+
     data_label = ttk.Label(window, text=f"Retailer, Amount Spent, Date", font=("Arial", 10))
     data_label.grid(row=5, column=5, columnspan=2)
-
-    transactions = connection.getTransactions(num)
-    Stransvar = StringVar(value=transactions)
-    Sviewer = Listbox(window, listvariable=Stransvar, width=30, height=2, font=("Arial", 10), justify=CENTER)
-    Sviewer.grid(row=6, column=5, rowspan=8, columnspan=2, ipadx=25, ipady=100)
-
-    balance_label = ttk.Label(window, text=f"Balance: ${connection.getBalance(num)}", font=("Arial", 10), justify=CENTER)
+    balance_label = ttk.Label(window, text=f"Balance: ${connection.getBalance(num)}", font=("Arial", 10),
+                              justify=CENTER)
     balance_label.grid(row=4, column=6)
 
+    if action == "show":
+        transactions = connection.getTransactions(num)
+        Stransvar = StringVar(value=transactions)
+        Sviewer = Listbox(window, listvariable=Stransvar, width=30, height=2, font=("Arial", 10), justify=CENTER)
+        Sviewer.grid(row=6, column=5, rowspan=8, columnspan=2, ipadx=25, ipady=100)
 
+    elif action == "sortDate":
+        transactions = connection.sortTransactionsDate(num)
+        Stransvar = StringVar(value=transactions)
+        Sviewer = Listbox(window, listvariable=Stransvar, width=30, height=2, font=("Arial", 10), justify=CENTER)
+        Sviewer.grid(row=6, column=5, rowspan=8, columnspan=2, ipadx=25, ipady=100)
+
+    elif action == "sortRetailer":
+        transactions = connection.sortTransactionsRetailer(num)
+        Stransvar = StringVar(value=transactions)
+        Sviewer = Listbox(window, listvariable=Stransvar, width=30, height=2, font=("Arial", 10), justify=CENTER)
+        Sviewer.grid(row=6, column=5, rowspan=8, columnspan=2, ipadx=25, ipady=100)
+
+    elif action == "sortAmount":
+        transactions = connection.sortTransactionsAmount(num)
+        Stransvar = StringVar(value=transactions)
+        Sviewer = Listbox(window, listvariable=Stransvar, width=30, height=2, font=("Arial", 10), justify=CENTER)
+        Sviewer.grid(row=6, column=5, rowspan=8, columnspan=2, ipadx=25, ipady=100)
+
+
+def sorter(num):
+
+    sort_date = ttk.Button(window, text="By Date",
+                           command=lambda: connection.sortTransactionsDate(num))
+    sort_date.grid(row=7, column=0, columnspan=2, rowspan=2, ipadx=10, ipady=10, pady=30)
+
+    sort_retailer = ttk.Button(window, text="By Retailer",
+                               command=lambda: print("Undone"))
+    sort_retailer.grid(row=8, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=30)
+
+    sort_amount = ttk.Button(window, text="By Amount (Asc)",
+                                   command=lambda: connection.sortTransactionsAmount(num))
+    sort_amount.grid(row=9, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=30)
 
 
 def getSessionTime():

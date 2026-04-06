@@ -9,7 +9,7 @@ from mysql.connector import Error
 def connectToMySQL():
     database = mysql.connector.connect(
         host="127.0.0.1",
-        port="3307",
+        port="3306",
         user="guest",
         password="psssword",
         database="project",
@@ -92,6 +92,60 @@ def getTransactions(num):
         transactions.append(dataline)
         # print(index)
     return transactions
+
+def sortTransactionsRetailer(num):
+    transactions = getTransactions(num)
+    sortedTransactions = []
+    for i in range(len(transactions)):
+        if i == 0:
+            pass
+
+
+
+def sortTransactionsAmount(num):
+    transactions = getTransactions(num)
+
+    for i in range(1, len(transactions)):
+        key = transactions[i]
+        key_amount = float(key.split(", ")[1])
+        j = i - 1
+        while j >= 0:
+            current_amount = float(transactions[j].split(", ")[1])
+            if current_amount > key_amount:
+                transactions[j + 1] = transactions[j]
+                j -= 1
+            else:
+                break
+
+        transactions[j + 1] = key
+    # print(transactions)
+    return transactions
+
+def sortTransactionsDate(num):
+    from datetime import datetime
+    transactions = getTransactions(num)
+    for i in range(1, len(transactions)):
+        key = transactions[i]
+
+        # Extract and parse the date from the key
+        key_str = key.split(", ")[0]
+        date_str = datetime.strptime(key_str, "%Y-%m-%d")
+        j = i - 1
+
+        while j >= 0:
+            current_date_str = transactions[j].split(", ")[0]
+            current_date = datetime.strptime(current_date_str, "%Y-%m-%d")
+
+            if current_date > date_str:
+                transactions[j + 1] = transactions[j]
+                j -= 1
+            else:
+                break
+
+        transactions[j + 1] = key
+
+        transactions[j + 1] = key
+    print(transactions)
 
 
 def autoGenTransactions():
