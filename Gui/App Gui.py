@@ -1,4 +1,3 @@
-import csv
 from tkinter import *
 from tkinter import ttk
 import re
@@ -6,6 +5,9 @@ import time
 from Objects import transaction as transaction
 from Objects import account as account
 import DB.connection as connection
+import random
+
+from Objects.account import Account
 
 GEOMETRY_DEFAULT = "800x600"
 
@@ -37,6 +39,58 @@ def getCurrentGeometry():
     return windowW, windowH
 
 
+def register():
+    cleanLogin()
+    register_button.forget()
+    global username, password, firstName, lastName
+
+    user_label = ttk.Label(window, text="Enter a Username")
+    user_label.pack()
+    username = Text(window, width=20, height=1)
+    username.pack()
+
+    pass_label = ttk.Label(window, text="Enter a Password")
+    pass_label.pack()
+    password = Text(window, width=20, height=1)
+    password.pack()
+
+    firstName_label = ttk.Label(window, text="Enter a First Name")
+    firstName_label.pack()
+    firstName = Text(window, width=20, height=1)
+    firstName.pack()
+
+    lastName_label = ttk.Label(window, text="Enter a Last Name")
+    lastName_label.pack()
+    lastName = Text(window, width=20, height=1)
+    lastName.pack()
+
+    NewSubmit_button = ttk.Button(window, text="Submit", command=lambda: submitNewUser)
+    NewSubmit_button.pack()
+
+    # renderHomeScreen(new_account)
+
+
+def submitNewUser():
+    global username, password, firstName, lastName
+
+    uName = username.get("1.0", END).strip()
+    print(uName)
+    pWord = password.get("1.0", END).strip()
+    print(pWord)
+    firstName = firstName.get("1.0", END).strip()
+    print(firstName)
+    lastName = lastName.get("1.0", END).strip()
+    print(lastName)
+    account_id = random.randint(0, 9999)
+    print(f"{uName}, {pWord}, {firstName}, {lastName}, {account_id}")
+    if not connection.check_id(account_id):
+        account_id + 1
+    else:
+        new_account = Account(uName, pWord, firstName, lastName, account_id)
+
+    print(new_account.toString())
+
+
 window = Tk()
 
 window.title("Finance App")
@@ -48,7 +102,6 @@ login_text = ttk.Label(window, text="Finance App")
 login_text.pack(pady=100, padx=300)
 
 # Login Text Boxes
-
 user_label = ttk.Label(window, text="Username")
 user_label.pack()
 username = Text(window, width=20, height=1)
@@ -58,6 +111,9 @@ pass_label = ttk.Label(window, text="Password")
 pass_label.pack()
 password = Text(window, width=20, height=1)
 password.pack()
+#
+# register_button = Button(window, text="Register", command=register)
+# register_button.pack()
 
 content = ttk.Frame(window)
 
@@ -106,11 +162,12 @@ def cleanLogin():
 
 
 def renderHomeScreen(user):
+
     user_label = ttk.Label(window, text=f"Hello {user.first_name}", font=("Arial", 20))
     user_label.grid(row=0, column=0, columnspan=2, rowspan=2, ipadx=40, ipady=10, padx=30, pady=30)
 
-    Add_transaction = ttk.Button(window, text="Add Transaction", command=connection.autoGenTransactions)
-    Add_transaction.grid(row=3, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10)
+    add_transaction = ttk.Button(window, text="Add Transaction", command=connection.autoGenTransactions)
+    add_transaction.grid(row=3, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10)
 
     sort_transactions = ttk.Button(window, text="Sort Transactions", command=lambda: print("Sort works"))
     sort_transactions.grid(row=6, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=30)
@@ -120,10 +177,13 @@ def renderHomeScreen(user):
 
     transaction_history = ttk.Button(window, text="Transaction History",
                                      command=lambda: displayTransactions(user.account_number))
-    transaction_history.grid(row=3, column=5, columnspan=2, rowspan=1, ipadx=60, ipady=10, padx=60)
+    transaction_history.grid(row=3, column=5, columnspan=2, ipadx=145, ipady=10, padx=30)
 
     chron_sort = ttk.Button(window, text="Most recent", command=lambda: print("Most Recent"))
-    chron_sort.grid(row=4, column=5, columnspan=2, rowspan=1,)
+    chron_sort.grid(row=4, column=5, ipadx=50)
+
+    balance_label = ttk.Label(window, text=f"Balance: ${user.balance}", font=("Arial", 10), justify=CENTER)
+    balance_label.grid(row=4, column=6)
 
 
     # for row in range(7):
@@ -141,7 +201,6 @@ def renderHomeScreen(user):
 
 
 def displayTransactions(num):
-
     data_label = ttk.Label(window, text=f"Retailer, Amount Spent, Date", font=("Arial", 10))
     data_label.grid(row=5, column=5, columnspan=2)
 
@@ -149,6 +208,11 @@ def displayTransactions(num):
     Stransvar = StringVar(value=transactions)
     Sviewer = Listbox(window, listvariable=Stransvar, width=30, height=2, font=("Arial", 10), justify=CENTER)
     Sviewer.grid(row=6, column=5, rowspan=8, columnspan=2, ipadx=25, ipady=100)
+
+    balance_label = ttk.Label(window, text=f"Balance: ${connection.getBalance(num)}", font=("Arial", 10), justify=CENTER)
+    balance_label.grid(row=4, column=6)
+
+
 
 
 def getSessionTime():

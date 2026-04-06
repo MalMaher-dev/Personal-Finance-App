@@ -1,5 +1,6 @@
 import random
 import time
+from Objects import account as account
 
 import mysql.connector
 from mysql.connector import Error
@@ -31,7 +32,7 @@ mycursor = mydb.cursor()
 
 
 def verifyAccount(username, password):
-    mycursor.execute(f"SELECT * FROM accountinfo WHERE username='{username}'")
+    mycursor.execute(f"SELECT * FROM accountinfo WHERE username='{username}';")
     result = mycursor.fetchall()
     if result == []:
         return False
@@ -42,10 +43,29 @@ def verifyAccount(username, password):
             return False
 
 
+def check_id(num):
+    mycursor.execute(f"SELECT accountNumber FROM accountinfo WHERE accountNumber='{num}';'")
+    result = mycursor.fetchall()
+    if not result:
+        print("id generated")
+        return False
+    else:
+        print("id not generated")
+        return True;
+
+
 def getAccount(username):
     mycursor.execute(f"SELECT * FROM accountinfo WHERE username='{username}'")
     result = mycursor.fetchall()
     return result
+
+
+def getAllAccounts():
+    accountNum = []
+    mycursor.execute("SELECT accountNumber FROM accountinfo")
+    result = mycursor.fetchall()
+    for i in result:
+        accountNum.append(i[0])
 
 
 def viewAllAccounts(mycursor):
@@ -55,6 +75,12 @@ def viewAllAccounts(mycursor):
     for index in result:
         accounts.append(index[3])
     return accounts
+
+
+def getBalance(accountNumber):
+    mycursor.execute(f"SELECT balance FROM accountinfo WHERE accountNumber='{accountNumber}'")
+    result = mycursor.fetchall()[0][0]
+    return result
 
 
 def getTransactions(num):
@@ -85,11 +111,10 @@ def autoGenTransactions():
     print("Transactions generated")
 
 
-def addAccount():  # Add accounts to account table
-    mycursor.execute("INSERT INTO accountinfo(")
-
-    mycursor.execute("INSERT INTO accountinfo(firstName,lastName,balance,accountNumber,username,password)"
-                     "VALUES ('Dayton','Dawson',0,1122,'dDawson','Daytond');")
+def addAccount(user):  # Add accounts to account table
+    mycursor.execute(f"INSERT INTO accountinfo(firstName,lastName,balance,accountNumber,username,password) "
+                     f"VALUES ('{user.first_name}','{user.last_name}',0,"
+                     f"{user.account_number}','{user.username}','{user.password}');")
     mydb.commit()
 
 
