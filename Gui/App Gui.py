@@ -170,7 +170,7 @@ def renderHomeScreen(user):
     add_transaction.grid(row=3, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10)
 
     sort_transactions = ttk.Button(window, text="Sort Transactions", command=lambda: sorter(user.account_number))
-    sort_transactions.grid(row=6, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=30)
+    sort_transactions.grid(row=6, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=(30,0))
 
     chart_transaction = ttk.Button(window, text="Chart Transaction", command=lambda: print("Chart works"))
     chart_transaction.grid(row=10, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=50)
@@ -234,18 +234,18 @@ def displayTransactions(num, action):
 
 
 def sorter(num):
-
-    sort_date = ttk.Button(window, text="By Date",
-                           command=lambda: connection.sortTransactionsDate(num))
-    sort_date.grid(row=7, column=0, columnspan=2, rowspan=2, ipadx=10, ipady=10, pady=30)
+    #
+    # sort_date = ttk.Button(window, text="By Date",
+    #                        command=lambda: connection.sortTransactionsDate(num))
+    # sort_date.grid(row=7, column=0, columnspan=2, rowspan=2, ipadx=10, ipady=10, pady=30)
 
     sort_retailer = ttk.Button(window, text="By Retailer",
                                command=lambda: print("Undone"))
-    sort_retailer.grid(row=8, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=30)
+    sort_retailer.grid(row=8, column=0, columnspan=2, rowspan=1, ipadx=25)
 
     sort_amount = ttk.Button(window, text="By Amount (Asc)",
-                                   command=lambda: connection.sortTransactionsAmount(num))
-    sort_amount.grid(row=9, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=30)
+                                   command=lambda: displayTransactions(num, "sortAmount"))
+    sort_amount.grid(row=9, column=0, columnspan=2, rowspan=1, ipadx=15)
 
 
 def getSessionTime():

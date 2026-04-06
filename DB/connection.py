@@ -128,13 +128,13 @@ def sortTransactionsDate(num):
         key = transactions[i]
 
         # Extract and parse the date from the key
-        key_str = key.split(", ")[0]
-        date_str = datetime.strptime(key_str, "%Y-%m-%d")
+        key_str = key.split(", ")[2]
+        date_str = datetime.strptime(key_str, "%x")
         j = i - 1
 
         while j >= 0:
-            current_date_str = transactions[j].split(", ")[0]
-            current_date = datetime.strptime(current_date_str, "%Y-%m-%d")
+            current_date_str = transactions[j].split(", ")[2]
+            current_date = datetime.strptime(current_date_str, "%x")
 
             if current_date > date_str:
                 transactions[j + 1] = transactions[j]
