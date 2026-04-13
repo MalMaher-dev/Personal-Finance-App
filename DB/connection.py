@@ -55,7 +55,6 @@ def check_id(num):
     mycursor.execute(f"SELECT accountNumber FROM accountinfo WHERE accountNumber='{num}';'")
     result = mycursor.fetchall()
     if not result:
-        print("id generated")
         return False
     else:
         return True;

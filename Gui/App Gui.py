@@ -43,19 +43,29 @@ def getCurrentGeometry():
 
 
 def submitNewUser():
-    global username, password, firstName, lastName
+    global username, password, firstName, lastName, fail_text
 
     uName = username.get("1.0", END).strip()
     pWord = password.get("1.0", END).strip()
     fName = firstName.get("1.0", END).strip()
     lName = lastName.get("1.0", END).strip()
     account_id = random.randint(0, 9999)
+    fields = [uName, pWord, fName, lName]
     # print(f"{uName}, {pWord}, {fName}, {lName}, {account_id}")
     if not connection.check_id(account_id):
         account_id += 1
         # new_account = account.Account(uName, pWord, firstName, lastName,balance=0, account_id=account_id)
-    new_account = account.Account(fName, lName, uName, pWord, balance=0, account_id=account_id)
+    for field in fields:
+        if field.strip() == "":
+            if fail_text:
+                fail_text.forget()
+            fail_text = ttk.Label(window, text="Fields cannot be empty")
+            fail_text.pack(pady=20)
+            return
 
+    if fail_text:
+        fail_text.forget()
+    new_account = account.Account(fName, lName, uName, pWord, balance=0, account_id=account_id)
     # print(new_account.toString())
     connection.addAccount(new_account)
 
@@ -125,7 +135,7 @@ def renderLoginScreen():
     NewSubmit_button.forget()
     loginOptionButton.forget()
 
-    login_text = ttk.Label(window, text="Finance App")
+    login_text = ttk.Label(window, text="Login")
     login_text.pack(pady=100, padx=300)
 
     # Login Text Boxes
