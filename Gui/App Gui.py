@@ -10,6 +10,7 @@ import random
 from Objects.account import Account
 
 GEOMETRY_DEFAULT = "800x600"
+fail_text = None
 
 
 #
@@ -38,35 +39,6 @@ def getCurrentGeometry():
     windowH = wGeo[1]
     return windowW, windowH
 
-
-def register():
-    cleanLogin()
-    # register_button.forget()
-    global username, password, firstName, lastName
-
-    user_label = ttk.Label(window, text="Enter a Username")
-    user_label.pack()
-    username = Text(window, width=20, height=1)
-    username.pack()
-
-    pass_label = ttk.Label(window, text="Enter a Password")
-    pass_label.pack()
-    password = Text(window, width=20, height=1)
-    password.pack()
-
-    firstName_label = ttk.Label(window, text="Enter a First Name")
-    firstName_label.pack()
-    firstName = Text(window, width=20, height=1)
-    firstName.pack()
-
-    lastName_label = ttk.Label(window, text="Enter a Last Name")
-    lastName_label.pack()
-    lastName = Text(window, width=20, height=1)
-    lastName.pack()
-
-    NewSubmit_button = ttk.Button(window, text="Submit", command=lambda: submitNewUser)
-    NewSubmit_button.pack()
-
     # renderHomeScreen(new_account)
 
 
@@ -74,21 +46,33 @@ def submitNewUser():
     global username, password, firstName, lastName
 
     uName = username.get("1.0", END).strip()
-    print(uName)
     pWord = password.get("1.0", END).strip()
-    print(pWord)
-    firstName = firstName.get("1.0", END).strip()
-    print(firstName)
-    lastName = lastName.get("1.0", END).strip()
-    print(lastName)
+    fName = firstName.get("1.0", END).strip()
+    lName = lastName.get("1.0", END).strip()
     account_id = random.randint(0, 9999)
-    print(f"{uName}, {pWord}, {firstName}, {lastName}, {account_id}")
+    print(f"{uName}, {pWord}, {fName}, {lName}, {account_id}")
     if not connection.check_id(account_id):
-        account_id + 1
-    else:
-        new_account = Account(uName, pWord, firstName, lastName, account_id)
+        account_id += 1
+        # new_account = account.Account(uName, pWord, firstName, lastName,balance=0, account_id=account_id)
+    new_account = account.Account(fName, lName, uName, pWord, balance=0, account_id=account_id)
 
     print(new_account.toString())
+    connection.addAccount(new_account)
+
+    registration_text.forget()
+    user_label.forget()
+    pass_label.forget()
+    firstName_label.forget()
+    lastName_label.forget()
+
+    username.forget()
+    password.forget()
+    firstName.forget()
+    lastName.forget()
+    NewSubmit_button.forget()
+    loginOptionButton.forget()
+
+    renderHomeScreen(new_account)
 
 
 window = Tk()
@@ -98,32 +82,82 @@ window.geometry(GEOMETRY_DEFAULT)
 
 window.resizable(False, False)
 
-login_text = ttk.Label(window, text="Finance App")
-login_text.pack(pady=100, padx=300)
+registration_text = ttk.Label(window, text="Registration")
+registration_text.pack(pady=100, padx=300)
 
-# Login Text Boxes
-user_label = ttk.Label(window, text="Username")
+# Registration Text Boxes
+user_label = ttk.Label(window, text="Enter a Username")
 user_label.pack()
 username = Text(window, width=20, height=1)
 username.pack()
 
-pass_label = ttk.Label(window, text="Password")
+pass_label = ttk.Label(window, text="Enter a Password")
 pass_label.pack()
 password = Text(window, width=20, height=1)
 password.pack()
+
+firstName_label = ttk.Label(window, text="Enter a First Name")
+firstName_label.pack()
+firstName = Text(window, width=20, height=1)
+firstName.pack()
+
+lastName_label = ttk.Label(window, text="Enter a Last Name")
+lastName_label.pack()
+lastName = Text(window, width=20, height=1)
+lastName.pack()
+
+NewSubmit_button = ttk.Button(window, text="Submit",
+                              command=submitNewUser)
+NewSubmit_button.pack()
+
+
+def renderLoginScreen():
+    global user_label, username, pass_label, password, firstName, lastName, login_text, submit_button
+    registration_text.forget()
+    user_label.forget()
+    pass_label.forget()
+    firstName_label.forget()
+    lastName_label.forget()
+    username.forget()
+    password.forget()
+    firstName.forget()
+    lastName.forget()
+    NewSubmit_button.forget()
+    loginOptionButton.forget()
+
+    login_text = ttk.Label(window, text="Finance App")
+    login_text.pack(pady=100, padx=300)
+
+    # Login Text Boxes
+    user_label = ttk.Label(window, text="Username")
+    user_label.pack()
+    username = Text(window, width=20, height=1)
+    username.pack()
+
+    pass_label = ttk.Label(window, text="Password")
+    pass_label.pack()
+    password = Text(window, width=20, height=1)
+    password.pack()
+
+    submit_button = Button(window, text="Submit", command=submit)
+    submit_button.pack(pady=20)
+
+
+loginOptionButton = ttk.Button(window, text="If you already have an account", command=renderLoginScreen)
+loginOptionButton.pack()
+
 #
 # register_button = Button(window, text="Register", command=register)
 # register_button.pack()
 
 content = ttk.Frame(window)
 
-# Buttons
 
-fail_text = None
+# Buttons
 
 
 def submit():
-    global fail_text
+    global fail_text, login_text, submit_button
     uName = username.get("1.0", END).strip()
     pWord = password.get("1.0", END).strip()
     # print(f"Information submitted, please wait for verification {uName} and password {pWord}")
@@ -136,55 +170,51 @@ def submit():
         # print("Welcome, give us a moment to adjust somethings")
         # print(user.toString())
         # print(getSessionTime(), " seconds")
-        cleanLogin()
+
+        login_text.forget()
+        user_label.forget()
+        pass_label.forget()
+        username.forget()
+        password.forget()
+        submit_button.forget()
         renderHomeScreen(user)
     else:
         fail_text = ttk.Label(window, text="Incorrect username or password")
         fail_text.pack(pady=20)
 
 
-submit_button = Button(window, text="Submit", command=submit)
-submit_button.pack(pady=20)
+# submit_button = Button(window, text="Submit", command=submit)
+# submit_button.pack(pady=20)
 
 
 # check_button = Button(window, text="Check Connection", command=connection.CheckConnection)
 # check_button.pack(pady=20)
 
 
-def cleanLogin():
-    login_text.forget()
-    user_label.forget()
-    pass_label.forget()
-    username.forget()
-    password.forget()
-    submit_button.forget()
-    # check_button.forget()
-
-
 def renderHomeScreen(user):
-
     user_label = ttk.Label(window, text=f"Hello {user.first_name}", font=("Arial", 20))
     user_label.grid(row=0, column=0, columnspan=2, rowspan=2, ipadx=40, ipady=10, padx=30, pady=30)
 
-    add_transaction = ttk.Button(window, text="Add Transaction", command=connection.autoGenTransactions)
+    add_transaction = ttk.Button(window, text="Add Transaction", command=addTransaction)
     add_transaction.grid(row=3, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10)
 
     sort_transactions = ttk.Button(window, text="Sort Transactions", command=lambda: sorter(user.account_number))
-    sort_transactions.grid(row=6, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=(30,0))
+    sort_transactions.grid(row=6, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=(30, 0))
 
     chart_transaction = ttk.Button(window, text="Chart Transaction", command=lambda: print("Chart works"))
     chart_transaction.grid(row=10, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=50)
 
     transaction_history = ttk.Button(window, text="Transaction History",
-                                     command=lambda: displayTransactions(user.account_number,"show"))
+                                     command=lambda: displayTransactions(user.account_number, "show"))
     transaction_history.grid(row=3, column=5, columnspan=2, ipadx=145, ipady=10, padx=30)
+
+    displayTransactions(user.account_number, "show")
 
     chron_sort = ttk.Button(window, text="Oldest to Newest", command=lambda: print("Old - New"))
     chron_sort.grid(row=4, column=5, ipadx=50)
 
     balance_label = ttk.Label(window, text=f"Balance: ${user.balance}", font=("Arial", 10), justify=CENTER)
     balance_label.grid(row=4, column=6)
-
 
     # for row in range(7):
     #     for col in range(10):
@@ -201,7 +231,6 @@ def renderHomeScreen(user):
 
 
 def displayTransactions(num, action):
-
     data_label = ttk.Label(window, text=f"Retailer, Amount Spent, Date", font=("Arial", 10))
     data_label.grid(row=5, column=5, columnspan=2)
     balance_label = ttk.Label(window, text=f"Balance: ${connection.getBalance(num)}", font=("Arial", 10),
@@ -244,8 +273,18 @@ def sorter(num):
     sort_retailer.grid(row=8, column=0, columnspan=2, rowspan=1, ipadx=25)
 
     sort_amount = ttk.Button(window, text="By Amount (Asc)",
-                                   command=lambda: displayTransactions(num, "sortAmount"))
+                             command=lambda: displayTransactions(num, "sortAmount"))
     sort_amount.grid(row=9, column=0, columnspan=2, rowspan=1, ipadx=15)
+
+
+def addTransaction():
+    new = Toplevel(window)
+    new.title("New Transaction")
+    new.geometry("400x300")
+
+    overview_label = Label(new, text="Enter transaction data to add").grid(row=0, column=0, columnspan=2,ipadx=50)
+
+
 
 
 def getSessionTime():

@@ -1,7 +1,7 @@
 import random
 import time
 from Objects import account as account
-
+from datetime import datetime
 import mysql.connector
 from mysql.connector import Error
 
@@ -9,7 +9,7 @@ from mysql.connector import Error
 def connectToMySQL():
     database = mysql.connector.connect(
         host="127.0.0.1",
-        port="3306",
+        port="3307",
         user="guest",
         password="psssword",
         database="project",
@@ -21,6 +21,13 @@ def connectToMySQL():
 mydb = connectToMySQL()
 
 
+def getConnection():
+    global mydb
+    if not mydb.is_connected():
+        mydb = connectToMySQL()  # reassign the global
+    return mydb
+
+
 def CheckConnection():
     if mydb.is_connected():
         print("Connection successful")
@@ -28,10 +35,9 @@ def CheckConnection():
         print("Connection failed")
 
 
-mycursor = mydb.cursor()
-
-
 def verifyAccount(username, password):
+    db = getConnection()
+    mycursor = db.cursor()
     mycursor.execute(f"SELECT * FROM accountinfo WHERE username='{username}';")
     result = mycursor.fetchall()
     if result == []:
@@ -44,17 +50,20 @@ def verifyAccount(username, password):
 
 
 def check_id(num):
+    db = getConnection()
+    mycursor = db.cursor()
     mycursor.execute(f"SELECT accountNumber FROM accountinfo WHERE accountNumber='{num}';'")
     result = mycursor.fetchall()
     if not result:
         print("id generated")
         return False
     else:
-        print("id not generated")
         return True;
 
 
 def getAccount(username):
+    db = getConnection()
+    mycursor = db.cursor()
     mycursor.execute(f"SELECT * FROM accountinfo WHERE username='{username}'")
     result = mycursor.fetchall()
     return result
@@ -62,6 +71,8 @@ def getAccount(username):
 
 def getAllAccounts():
     accountNum = []
+    db = getConnection()
+    mycursor = db.cursor()
     mycursor.execute("SELECT accountNumber FROM accountinfo")
     result = mycursor.fetchall()
     for i in result:
@@ -70,6 +81,8 @@ def getAllAccounts():
 
 def viewAllAccounts(mycursor):
     accounts = []
+    db = getConnection()
+    mycursor = db.cursor()
     mycursor.execute("SELECT * FROM accounts")
     result = mycursor.fetchall()
     for index in result:
@@ -78,6 +91,8 @@ def viewAllAccounts(mycursor):
 
 
 def getBalance(accountNumber):
+    db = getConnection()
+    mycursor = db.cursor()
     mycursor.execute(f"SELECT balance FROM accountinfo WHERE accountNumber='{accountNumber}'")
     result = mycursor.fetchall()[0][0]
     return result
@@ -85,13 +100,16 @@ def getBalance(accountNumber):
 
 def getTransactions(num):
     transactions = []
+    db = getConnection()
+    mycursor = db.cursor()
     mycursor.execute(f"SELECT * FROM transactions WHERE accountNumber = {num}")
     result = mycursor.fetchall()
     for index in result:
-        dataline = f"{index[4]}, {index[3]}, {index[0].strftime('%x')}"
+        dataline = f"{index[4]}, ${index[3]}, {index[0].strftime('%x')}"
         transactions.append(dataline)
         # print(index)
     return transactions
+
 
 def sortTransactionsRetailer(num):
     transactions = getTransactions(num)
@@ -101,16 +119,15 @@ def sortTransactionsRetailer(num):
             pass
 
 
-
 def sortTransactionsAmount(num):
     transactions = getTransactions(num)
 
     for i in range(1, len(transactions)):
         key = transactions[i]
-        key_amount = float(key.split(", ")[1])
+        key_amount = float(key.split(", ")[1][1:])
         j = i - 1
         while j >= 0:
-            current_amount = float(transactions[j].split(", ")[1])
+            current_amount = float(transactions[j].split(", ")[1][1:])
             if current_amount > key_amount:
                 transactions[j + 1] = transactions[j]
                 j -= 1
@@ -121,8 +138,8 @@ def sortTransactionsAmount(num):
     # print(transactions)
     return transactions
 
+
 def sortTransactionsDate(num):
-    from datetime import datetime
     transactions = getTransactions(num)
     for i in range(1, len(transactions)):
         key = transactions[i]
@@ -147,9 +164,17 @@ def sortTransactionsDate(num):
         transactions[j + 1] = key
     print(transactions)
 
+def addTransaction():
+    pass
+
+def editTransaction(num):
+    pass
+
 
 def autoGenTransactions():
     accounts = []
+    db = getConnection()
+    mycursor = db.cursor()
     mycursor.execute("SELECT accountNumber FROM accountinfo")
     result = mycursor.fetchall()
     for i in result:
@@ -166,14 +191,18 @@ def autoGenTransactions():
 
 
 def addAccount(user):  # Add accounts to account table
+    db = getConnection()
+    mycursor = db.cursor()
     mycursor.execute(f"INSERT INTO accountinfo(firstName,lastName,balance,accountNumber,username,password) "
-                     f"VALUES ('{user.first_name}','{user.last_name}',0,"
-                     f"{user.account_number}','{user.username}','{user.password}');")
+                     f"VALUES ('{user.first_name}','{user.last_name}','{user.balance}',"
+                     f"'{user.account_number}','{user.username}','{user.password}');")
     mydb.commit()
 
 
 def sortByAccount(accountNumber):
     transactions = []
+    db = getConnection()
+    mycursor = db.cursor()
     mycursor.execute(f"SELECT * FROM transactions WHERE accountNumber='{accountNumber}'")
     result = mycursor.fetchall()
     for index in result:
@@ -182,12 +211,16 @@ def sortByAccount(accountNumber):
 
 
 def sortByRetailer(retailer):
+    db = getConnection()
+    mycursor = db.cursor()
     mycursor.execute(f"SELECT * FROM transactions WHERE retailer='{retailer}'")
     result = mycursor.fetchall()
     return result
 
 
 def greaterThanAverage():
+    db = getConnection()
+    mycursor = db.cursor()
     mycursor.execute("SELECT * FROM transactions"
                      " WHERE amount >= (SELECT AVG(amount) FROM transactions)"
                      " ORDER BY amount ASC;")
