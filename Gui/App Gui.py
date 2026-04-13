@@ -192,10 +192,10 @@ def submit():
 
 
 def renderHomeScreen(user):
-    user_label = ttk.Label(window, text=f"Hello {user.first_name}", font=("Arial", 20))
+    user_label = ttk.Label(window, text=f"Hello {user.first_name},", font=("Arial", 20))
     user_label.grid(row=0, column=0, columnspan=2, rowspan=2, ipadx=40, ipady=10, padx=30, pady=30)
 
-    add_transaction = ttk.Button(window, text="Add Transaction", command=addTransaction)
+    add_transaction = ttk.Button(window, text="Add Transaction", command=lambda: addTransaction(user.account_number))
     add_transaction.grid(row=3, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10)
 
     sort_transactions = ttk.Button(window, text="Sort Transactions", command=lambda: sorter(user.account_number))
@@ -213,9 +213,6 @@ def renderHomeScreen(user):
     chron_sort = ttk.Button(window, text="Oldest to Newest", command=lambda: print("Old - New"))
     chron_sort.grid(row=4, column=5, ipadx=50)
 
-    balance_label = ttk.Label(window, text=f"Balance: ${user.balance}", font=("Arial", 10), justify=CENTER)
-    balance_label.grid(row=4, column=6)
-
     # for row in range(7):
     #     for col in range(10):
     #         Button(
@@ -231,7 +228,7 @@ def renderHomeScreen(user):
 
 
 def displayTransactions(num, action):
-    data_label = ttk.Label(window, text=f"Transaction Number, Retailer, Amount Spent, Date", font=("Arial", 10))
+    data_label = ttk.Label(window, text=f"Transaction #, Retailer, Amount Spent, Date", font=("Arial", 10))
     data_label.grid(row=5, column=5, columnspan=2)
     balance_label = ttk.Label(window, text=f"Balance: ${connection.getBalance(num)}", font=("Arial", 10),
                               justify=CENTER)
@@ -268,21 +265,45 @@ def sorter(num):
     #                        command=lambda: connection.sortTransactionsDate(num))
     # sort_date.grid(row=7, column=0, columnspan=2, rowspan=2, ipadx=10, ipady=10, pady=30)
 
-    sort_retailer = ttk.Button(window, text="By Retailer",
-                               command=lambda: print("Undone"))
-    sort_retailer.grid(row=8, column=0, columnspan=2, rowspan=1, ipadx=25)
+    # sort_retailer = ttk.Button(window, text="By Retailer",
+    #                            command=lambda: print("Undone"))
+    # sort_retailer.grid(row=8, column=0, columnspan=2, rowspan=1, ipadx=25)
 
     sort_amount = ttk.Button(window, text="By Amount (Asc)",
                              command=lambda: displayTransactions(num, "sortAmount"))
     sort_amount.grid(row=9, column=0, columnspan=2, rowspan=1, ipadx=15)
 
+def confirmAdd(num, retailer, amount, pane):
+    connection.addTransaction(num, amount, retailer)
+    displayTransactions(num, "show")
+    pane.destroy()
 
-def addTransaction():
+
+def addTransaction(num):
     new = Toplevel(window)
     new.title("New Transaction")
-    new.geometry("400x300")
+    new.geometry("300x300")
 
     overview_label = Label(new, text="Enter transaction data to add").grid(row=0, column=0, columnspan=2,ipadx=50)
+
+    retailer_label = Label(new, text=f"Retailer", font=("Arial", 10))
+    retailer_label.grid(row=2, column=0, columnspan=2, pady=10, padx=50)
+
+    retailerBox = Text(new, width=20, height=1)
+    retailerBox.grid(row=3, column=0, padx=50, pady=5)
+
+
+    amount_label = Label(new, text="Amount", font=("Arial", 10))
+    amount_label.grid(row=4, column=0, columnspan=2, pady=10)
+
+    amountBox = Text(new, width=20, height=1)
+    amountBox.grid(row=5, column=0, padx=50, pady=5)
+
+    correct = Button(new, text="Submit",
+                     command=lambda: confirmAdd(num, retailerBox.get("1.0", END),
+                                                amountBox.get("1.0", END), new))
+    correct.grid(row=6, column=0, columnspan=2, pady=10)
+
 
 global numberBox
 
@@ -297,8 +318,9 @@ def editor(num):
     submitButton = ttk.Button(window, text="edit", command=lambda: editTransaction(num) )
     submitButton.grid(row=12, column=1, ipadx=10)
 
-def confirmEdit(trans_id, amount, pane):
+def confirmEdit(num, trans_id, amount, pane):
     connection.editTransaction(trans_id, amount)
+    displayTransactions(num, "show")
     pane.destroy()
 
 def editTransaction(accountNumber):
@@ -306,7 +328,7 @@ def editTransaction(accountNumber):
     id = username.get("1.0", END)
     new = Toplevel(window)
     new.title("Edit Transaction")
-    new.geometry("400x300")
+    new.geometry("300x300")
 
     overview_label = Label(new, text="Enter new amount").grid(row=0, column=0, columnspan=2,ipadx=50)
 
@@ -323,9 +345,9 @@ def editTransaction(accountNumber):
         amount_label.grid(row=3, column=0, pady=20)
 
         amountBox = Text(new, width=5, height=1)
-        amountBox.grid(row=3, column=1, pady=20)
+        amountBox.grid(row=3, column=1, padx=10, pady=20)
 
-        correct = Button(new, text="Submit", command=lambda: confirmEdit(id, amountBox.get("1.0", END), new))
+        correct = Button(new, text="Submit", command=lambda: confirmEdit(accountNumber,id, amountBox.get("1.0", END), new))
         correct.grid(row=4, column=0, columnspan=2, pady=20)
 
 def getSessionTime():

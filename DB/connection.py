@@ -172,13 +172,18 @@ def sortTransactionsDate(num):
         transactions[j + 1] = key
     print(transactions)
 
-def addTransaction():
-    pass
+def addTransaction(num, spent, seller):
+    db = getConnection()
+    mycursor = db.cursor()
+    mycursor.execute(f"INSERT INTO transactions (accountNumber,amount,retailer)"
+                     f" VALUES ({num},{spent},'{str(seller)}')")
+    mydb.commit()
 
 def editTransaction(transaction_id,amount):
     db = getConnection()
     mycursor = db.cursor()
     mycursor.execute(f"Update transactions SET amount = {amount} WHERE transactionNumber = {transaction_id}")
+    mydb.commit()
 
 def autoGenTransactions():
     accounts = []
@@ -203,7 +208,7 @@ def addAccount(user):  # Add accounts to account table
     db = getConnection()
     mycursor = db.cursor()
     mycursor.execute(f"INSERT INTO accountinfo(firstName,lastName,balance,accountNumber,username,password) "
-                     f"VALUES ('{user.first_name}','{user.last_name}','{user.balance}',"
+                     f"VALUES ('{user.first_name}','{user.last_name}','{0}',"
                      f"'{user.account_number}','{user.username}','{user.password}');")
     mydb.commit()
 
