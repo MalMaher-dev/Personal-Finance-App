@@ -9,7 +9,7 @@ from mysql.connector import Error
 def connectToMySQL():
     database = mysql.connector.connect(
         host="127.0.0.1",
-        port="3307",
+        port="3306",
         user="guest",
         password="psssword",
         database="project",
@@ -98,6 +98,14 @@ def getBalance(accountNumber):
     return result
 
 
+def getTransaction(num):
+    db = getConnection()
+    mycursor = db.cursor()
+    mycursor.execute(f"SELECT * FROM transactions WHERE transactionNumber={num}")
+    result = mycursor.fetchall()
+    return result[0]
+
+
 def getTransactions(num):
     transactions = []
     db = getConnection()
@@ -105,7 +113,7 @@ def getTransactions(num):
     mycursor.execute(f"SELECT * FROM transactions WHERE accountNumber = {num}")
     result = mycursor.fetchall()
     for index in result:
-        dataline = f"{index[4]}, ${index[3]}, {index[0].strftime('%x')}"
+        dataline = f"{index[2]}, {index[4]}, ${index[3]}, {index[0].strftime('%x')}"
         transactions.append(dataline)
         # print(index)
     return transactions
@@ -167,9 +175,10 @@ def sortTransactionsDate(num):
 def addTransaction():
     pass
 
-def editTransaction(num):
-    pass
-
+def editTransaction(transaction_id,amount):
+    db = getConnection()
+    mycursor = db.cursor()
+    mycursor.execute(f"Update transactions SET amount = {amount} WHERE transactionNumber = {transaction_id}")
 
 def autoGenTransactions():
     accounts = []

@@ -50,13 +50,13 @@ def submitNewUser():
     fName = firstName.get("1.0", END).strip()
     lName = lastName.get("1.0", END).strip()
     account_id = random.randint(0, 9999)
-    print(f"{uName}, {pWord}, {fName}, {lName}, {account_id}")
+    # print(f"{uName}, {pWord}, {fName}, {lName}, {account_id}")
     if not connection.check_id(account_id):
         account_id += 1
         # new_account = account.Account(uName, pWord, firstName, lastName,balance=0, account_id=account_id)
     new_account = account.Account(fName, lName, uName, pWord, balance=0, account_id=account_id)
 
-    print(new_account.toString())
+    # print(new_account.toString())
     connection.addAccount(new_account)
 
     registration_text.forget()
@@ -201,8 +201,8 @@ def renderHomeScreen(user):
     sort_transactions = ttk.Button(window, text="Sort Transactions", command=lambda: sorter(user.account_number))
     sort_transactions.grid(row=6, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=(30, 0))
 
-    chart_transaction = ttk.Button(window, text="Chart Transaction", command=lambda: print("Chart works"))
-    chart_transaction.grid(row=10, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=50)
+    edit_transaction = ttk.Button(window, text="Edit Transaction", command=lambda: editor(user.account_number))
+    edit_transaction.grid(row=10, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=50)
 
     transaction_history = ttk.Button(window, text="Transaction History",
                                      command=lambda: displayTransactions(user.account_number, "show"))
@@ -231,7 +231,7 @@ def renderHomeScreen(user):
 
 
 def displayTransactions(num, action):
-    data_label = ttk.Label(window, text=f"Retailer, Amount Spent, Date", font=("Arial", 10))
+    data_label = ttk.Label(window, text=f"Transaction Number, Retailer, Amount Spent, Date", font=("Arial", 10))
     data_label.grid(row=5, column=5, columnspan=2)
     balance_label = ttk.Label(window, text=f"Balance: ${connection.getBalance(num)}", font=("Arial", 10),
                               justify=CENTER)
@@ -284,8 +284,49 @@ def addTransaction():
 
     overview_label = Label(new, text="Enter transaction data to add").grid(row=0, column=0, columnspan=2,ipadx=50)
 
+global numberBox
 
+def editor(num):
+    global username
+    number_label = Label(window, text="Transaction Number: ", font=("Arial", 10))
+    number_label.grid(row=11, column=0, columnspan=2)
 
+    username = Text(window, width=20, height=1, font=("Arial", 10))
+    username.grid(row=12, column=0, columnspan=1)
+
+    submitButton = ttk.Button(window, text="edit", command=lambda: editTransaction(num) )
+    submitButton.grid(row=12, column=1, ipadx=10)
+
+def confirmEdit(trans_id, amount, pane):
+    connection.editTransaction(trans_id, amount)
+    pane.destroy()
+
+def editTransaction(accountNumber):
+    global fail_text, username
+    id = username.get("1.0", END)
+    new = Toplevel(window)
+    new.title("Edit Transaction")
+    new.geometry("400x300")
+
+    overview_label = Label(new, text="Enter new amount").grid(row=0, column=0, columnspan=2,ipadx=50)
+
+    transaction = connection.getTransaction(id)
+    if accountNumber != transaction[1]:
+        fail_text = ttk.Label(window, text="Unable to retrieve")
+        fail_text.grid(pady=20)
+    else:
+        transData = f"{transaction[4]}, {transaction[3]}"
+        data_label = Label(new, text=f"{transData}", font=("Arial", 10))
+        data_label.grid(row=2, column=0, columnspan=2, pady=20, padx=50)
+
+        amount_label = Label(new, text="Amount", font=("Arial", 10))
+        amount_label.grid(row=3, column=0, pady=20)
+
+        amountBox = Text(new, width=5, height=1)
+        amountBox.grid(row=3, column=1, pady=20)
+
+        correct = Button(new, text="Submit", command=lambda: confirmEdit(id, amountBox.get("1.0", END), new))
+        correct.grid(row=4, column=0, columnspan=2, pady=20)
 
 def getSessionTime():
     return round(time.time() - startTime, 2)
