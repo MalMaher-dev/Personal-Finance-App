@@ -58,7 +58,7 @@ DROP TABLE IF EXISTS `transactions`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `transactions` (
   `dateCreated` datetime DEFAULT current_timestamp(),
-  `dateDone` date NOT NULL,
+  `dateDone` varchar(255) NOT NULL,
   `accountNumber` int(11) DEFAULT NULL,
   `transactionNumber` int(11) NOT NULL AUTO_INCREMENT,
   `amount` decimal(10,2) DEFAULT NULL,

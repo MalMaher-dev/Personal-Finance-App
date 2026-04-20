@@ -1,3 +1,4 @@
+import tkinter
 from datetime import datetime
 from tkinter import *
 from tkinter import ttk
@@ -47,7 +48,7 @@ def submitNewUser():
     global username, password, firstName, lastName, fail_text
 
     uName = username.get("1.0", END).strip()
-    pWord = password.get("1.0", END).strip()
+    pWord = password.get().strip()
     fName = firstName.get("1.0", END).strip()
     lName = lastName.get("1.0", END).strip()
     account_id = random.randint(0, 9999)
@@ -104,7 +105,7 @@ username.pack()
 
 pass_label = ttk.Label(window, text="Enter a Password")
 pass_label.pack()
-password = Text(window, width=20, height=1)
+password = Entry(window, width=25, show='*')
 password.pack()
 
 firstName_label = ttk.Label(window, text="Enter a First Name")
@@ -117,8 +118,7 @@ lastName_label.pack()
 lastName = Text(window, width=20, height=1)
 lastName.pack()
 
-NewSubmit_button = ttk.Button(window, text="Submit",
-                              command=submitNewUser)
+NewSubmit_button = tkinter.Button(window, text="Submit",command=submitNewUser)
 NewSubmit_button.pack()
 
 
@@ -147,14 +147,15 @@ def renderLoginScreen():
 
     pass_label = ttk.Label(window, text="Password")
     pass_label.pack()
-    password = Text(window, width=20, height=1)
+    password = Entry(window, width=25, show='*')
     password.pack()
 
     submit_button = Button(window, text="Submit", command=submit)
     submit_button.pack(pady=20)
 
 
-loginOptionButton = ttk.Button(window, text="If you already have an account", command=renderLoginScreen)
+loginOptionButton = tkinter.Button(window, text="If you already have an account", command=renderLoginScreen,
+                                relief=tkinter.RIDGE, borderwidth=2)
 loginOptionButton.pack()
 content = ttk.Frame(window)
 
@@ -165,7 +166,8 @@ content = ttk.Frame(window)
 def submit():
     global fail_text, login_text, submit_button
     uName = username.get("1.0", END).strip()
-    pWord = password.get("1.0", END).strip()
+    pWord = password.get().strip()
+    login_text.forget()
     # print(f"Information submitted, please wait for verification {uName} and password {pWord}")
     if connection.verifyAccount(uName, pWord):
         if fail_text:
@@ -215,6 +217,36 @@ def renderHomeScreen(user):
     transaction_history.grid(row=3, column=5, columnspan=2, ipadx=145, ipady=10, padx=30)
 
     displayTransactions(user.account_number, "show")
+
+    widgets = [user_label, add_transaction, sort_transactions, edit_transaction, transaction_history]
+
+    # logOut = tkinter.Button(window, text="Logout", command=lambda :cleanLogin)
+    # logOut.grid(row=16, columnspan=6)
+
+def cleanLogin():
+    window.destroy()
+    window.title("Finance App")
+    window.geometry(GEOMETRY_DEFAULT)
+
+    window.resizable(False, False)
+
+    login_text = ttk.Label(window, text="Login")
+    login_text.pack(pady=100, padx=300)
+
+    # Login Text Boxes
+    user_label = ttk.Label(window, text="Username")
+    user_label.pack()
+    username = Text(window, width=20, height=1)
+    username.pack()
+
+    pass_label = ttk.Label(window, text="Password")
+    pass_label.pack()
+    password = Entry(window, width=25, show='*')
+    password.pack()
+
+    submit_button = Button(window, text="Submit", command=submit)
+    submit_button.pack(pady=20)
+
 
     # chron_sort = ttk.Button(window, text="Oldest to Newest", command=lambda: print("Old - New"))
     # chron_sort.grid(row=4, column=5, ipadx=50)
@@ -343,7 +375,6 @@ def confirmEdit(num, trans_id, amount, date, pane):
     if date == "":
         date = tran[4]
     dateStr = datetime.strptime(date, "%Y-%m-%d").date()
-    print(tran)
     connection.editTransaction(trans_id, amount, dateStr)
     displayTransactions(num, "show")
     pane.destroy()

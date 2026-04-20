@@ -184,7 +184,7 @@ def addTransaction(num, spent, seller, date):
 def editTransaction(transaction_id, amount, date):
     db = getConnection()
     mycursor = db.cursor()
-    mycursor.execute(f"Update transactions SET amount = {amount},dateDone = {date} WHERE transactionNumber = {transaction_id}")
+    mycursor.execute(f"Update transactions SET amount = {amount},dateDone = '{date}' WHERE transactionNumber = {transaction_id}")
     mydb.commit()
 
 
