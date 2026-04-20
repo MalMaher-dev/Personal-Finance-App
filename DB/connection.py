@@ -9,7 +9,7 @@ from mysql.connector import Error
 def connectToMySQL():
     database = mysql.connector.connect(
         host="127.0.0.1",
-        port="3307",
+        port="3306",
         user="guest",
         password="psssword",
         database="project",
@@ -180,10 +180,11 @@ def addTransaction(num, spent, seller, date):
     mydb.commit()
 
 
-def editTransaction(transaction_id, amount):
+
+def editTransaction(transaction_id, amount, date):
     db = getConnection()
     mycursor = db.cursor()
-    mycursor.execute(f"Update transactions SET amount = {amount} WHERE transactionNumber = {transaction_id}")
+    mycursor.execute(f"Update transactions SET amount = {amount},dateDone = {date} WHERE transactionNumber = {transaction_id}")
     mydb.commit()
 
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 from tkinter import *
 from tkinter import ttk
 import re
@@ -155,11 +156,6 @@ def renderLoginScreen():
 
 loginOptionButton = ttk.Button(window, text="If you already have an account", command=renderLoginScreen)
 loginOptionButton.pack()
-
-#
-# register_button = Button(window, text="Register", command=register)
-# register_button.pack()
-
 content = ttk.Frame(window)
 
 
@@ -220,8 +216,8 @@ def renderHomeScreen(user):
 
     displayTransactions(user.account_number, "show")
 
-    chron_sort = ttk.Button(window, text="Oldest to Newest", command=lambda: print("Old - New"))
-    chron_sort.grid(row=4, column=5, ipadx=50)
+    # chron_sort = ttk.Button(window, text="Oldest to Newest", command=lambda: print("Old - New"))
+    # chron_sort.grid(row=4, column=5, ipadx=50)
 
     # for row in range(7):
     #     for col in range(10):
@@ -329,49 +325,68 @@ global numberBox
 def editor(num):
     global username
     number_label = Label(window, text="Transaction Number: ", font=("Arial", 10))
-    number_label.grid(row=11, column=0, columnspan=2)
+    number_label.grid(row=12, column=0, columnspan=2)
 
-    username = Text(window, width=20, height=1, font=("Arial", 10))
-    username.grid(row=12, column=0, columnspan=1)
+    username = Text(window, width=15, height=1, font=("Arial", 10))
+    username.grid(row=13, column=0, columnspan=1, padx=10)
 
     submitButton = ttk.Button(window, text="edit", command=lambda: editTransaction(num))
-    submitButton.grid(row=12, column=1, ipadx=10)
+    submitButton.grid(row=13, column=1, ipadx=5)
 
 
-def confirmEdit(num, trans_id, amount, pane):
-    connection.editTransaction(trans_id, amount)
+def confirmEdit(num, trans_id, amount, date, pane):
+    amount = amount.strip()
+    tran = connection.getTransaction(trans_id)
+
+    if amount == "":
+        amount = tran[3]
+    if date == "":
+        date = tran[4]
+    dateStr = datetime.strptime(date, "%Y-%m-%d").date()
+    print(tran)
+    connection.editTransaction(trans_id, amount, dateStr)
     displayTransactions(num, "show")
     pane.destroy()
+    #
+    # connection.editTransaction(trans_id,amount,date)
+    # displayTransactions(num, "show")
+    # pane.destroy()
 
 
 def editTransaction(accountNumber):
     global fail_text, username
-    id = username.get("1.0", END)
+    id = username.get("1.0", END).strip()
     new = Toplevel(window)
     new.title("Edit Transaction")
     new.geometry("300x300")
 
-    overview_label = Label(new, text="Enter new amount").grid(row=0, column=0, columnspan=2, ipadx=50)
+    Label(new, text="Enter new amount").grid(row=0, column=0, columnspan=2, ipadx=50)
 
     transaction = connection.getTransaction(id)
-    if accountNumber != transaction[1]:
+    if not transaction or accountNumber != transaction[2]:
         fail_text = ttk.Label(window, text="Unable to retrieve")
         fail_text.grid(pady=20)
-    else:
-        transData = f"{transaction[4]}, {transaction[3]}"
-        data_label = Label(new, text=f"{transData}", font=("Arial", 10))
-        data_label.grid(row=2, column=0, columnspan=2, pady=20, padx=50)
+        return
+    transData = f"{transaction[5]}, {transaction[4]}, {transaction[1]}"
+    data_label = Label(new, text=f"{transData}", font=("Arial", 10))
+    data_label.grid(row=2, column=0, columnspan=2, pady=20, padx=50)
 
-        amount_label = Label(new, text="Amount", font=("Arial", 10))
-        amount_label.grid(row=3, column=0, pady=20)
+    amount_label = Label(new, text="Amount", font=("Arial", 10))
+    amount_label.grid(row=3, column=0, pady=20)
 
-        amountBox = Text(new, width=5, height=1)
-        amountBox.grid(row=3, column=1, padx=10, pady=20)
+    amountBox = Text(new, width=5, height=1)
+    amountBox.grid(row=3, column=1, padx=10, pady=20)
 
-        correct = Button(new, text="Submit",
-                         command=lambda: confirmEdit(accountNumber, id, amountBox.get("1.0", END), new))
-        correct.grid(row=4, column=0, columnspan=2, pady=20)
+    date_label = Label(new, text="Date", font=("Arial", 10))
+    date_label.grid(row=4, column=0, pady=20)
 
+    dateBox = Text(new, width=5, height=1)
+    dateBox.grid(row=4, column=1, ipadx=20, pady=20)
+
+    correct = Button(new, text="Submit",
+                     command=lambda: confirmEdit(accountNumber, id, amountBox.get("1.0", END).strip(),
+                                                 str(dateBox.get("1.0", END)).strip(),new))
+    correct.grid(row=6, column=0, columnspan=2, pady=20)
 
 def getSessionTime():
     return round(time.time() - startTime, 2)
