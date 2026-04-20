@@ -9,7 +9,7 @@ from mysql.connector import Error
 def connectToMySQL():
     database = mysql.connector.connect(
         host="127.0.0.1",
-        port="3306",
+        port="3307",
         user="guest",
         password="psssword",
         database="project",
@@ -112,7 +112,7 @@ def getTransactions(num):
     mycursor.execute(f"SELECT * FROM transactions WHERE accountNumber = {num}")
     result = mycursor.fetchall()
     for index in result:
-        dataline = f"{index[2]}, {index[4]}, ${index[3]}, {index[0].strftime('%x')}"
+        dataline = f"{index[3]}, {index[5]}, ${index[4]}, {index[1]}"
         transactions.append(dataline)
         # print(index)
     return transactions
@@ -171,18 +171,21 @@ def sortTransactionsDate(num):
         transactions[j + 1] = key
     print(transactions)
 
-def addTransaction(num, spent, seller):
+
+def addTransaction(num, spent, seller, date):
     db = getConnection()
     mycursor = db.cursor()
-    mycursor.execute(f"INSERT INTO transactions (accountNumber,amount,retailer)"
-                     f" VALUES ({num},{spent},'{str(seller)}')")
+    mycursor.execute(f"INSERT INTO transactions (dateDone,accountNumber,amount,retailer)"
+                     f" VALUES ('{str(date).strip()}',{num},{spent},'{str(seller).strip()}')")
     mydb.commit()
 
-def editTransaction(transaction_id,amount):
+
+def editTransaction(transaction_id, amount):
     db = getConnection()
     mycursor = db.cursor()
     mycursor.execute(f"Update transactions SET amount = {amount} WHERE transactionNumber = {transaction_id}")
     mydb.commit()
+
 
 def autoGenTransactions():
     accounts = []
