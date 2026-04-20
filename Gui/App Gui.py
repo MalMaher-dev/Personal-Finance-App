@@ -378,11 +378,6 @@ def confirmEdit(num, trans_id, amount, date, pane):
     connection.editTransaction(trans_id, amount, dateStr)
     displayTransactions(num, "show")
     pane.destroy()
-    #
-    # connection.editTransaction(trans_id,amount,date)
-    # displayTransactions(num, "show")
-    # pane.destroy()
-
 
 def editTransaction(accountNumber):
     global fail_text, username
@@ -405,13 +400,13 @@ def editTransaction(accountNumber):
     amount_label = Label(new, text="Amount", font=("Arial", 10))
     amount_label.grid(row=3, column=0, pady=20)
 
-    amountBox = Text(new, width=5, height=1)
+    amountBox = Text(new, width=7, height=1)
     amountBox.grid(row=3, column=1, padx=10, pady=20)
 
     date_label = Label(new, text="Date", font=("Arial", 10))
     date_label.grid(row=4, column=0, pady=20)
 
-    dateBox = Text(new, width=5, height=1)
+    dateBox = Text(new, width=7, height=1)
     dateBox.grid(row=4, column=1, ipadx=20, pady=20)
 
     correct = Button(new, text="Submit",
