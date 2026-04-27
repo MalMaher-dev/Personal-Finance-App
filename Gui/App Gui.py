@@ -80,22 +80,31 @@ registration_text.pack(pady=100, padx=300)
 # Registration Text Boxes
 user_label = ttk.Label(window, text="Enter a Username")
 user_label.pack()
-username = Text(window, width=20, height=1)
+user_label.configure(takefocus=0)
+
+username = Entry(window, width=25)
 username.pack()
+username.focus()
 
 pass_label = ttk.Label(window, text="Enter a Password")
 pass_label.pack()
+pass_label.configure(takefocus=0)
+
 password = Entry(window, width=25, show='*')
 password.pack()
 
 firstName_label = ttk.Label(window, text="Enter a First Name")
 firstName_label.pack()
-firstName = Text(window, width=20, height=1)
+firstName_label.configure(takefocus=0)
+
+firstName = Entry(window, width=25)
 firstName.pack()
 
 lastName_label = ttk.Label(window, text="Enter a Last Name")
 lastName_label.pack()
-lastName = Text(window, width=20, height=1)
+lastName_label.configure(takefocus=0)
+
+lastName = Entry(window, width=25)
 lastName.pack()
 
 NewSubmit_button = tkinter.Button(window, text="Submit",command=submitNewUser)
@@ -105,30 +114,38 @@ NewSubmit_button.pack()
 def renderLoginScreen():
     # print(connection.getTransactions(9521))
     global user_label, username, pass_label, password, firstName, lastName, login_text, submit_button
-    registration_text.forget()
-    user_label.forget()
-    pass_label.forget()
-    firstName_label.forget()
-    lastName_label.forget()
-    username.forget()
-    password.forget()
-    firstName.forget()
-    lastName.forget()
-    NewSubmit_button.forget()
-    loginOptionButton.forget()
+    # registration_text.forget()
+    # user_label.forget()
+    # pass_label.forget()
+    # firstName_label.forget()
+    # lastName_label.forget()
+    # username.forget()
+    # password.forget()
+    # firstName.forget()
+    # lastName.forget()
+    # NewSubmit_button.forget()
+    # loginOptionButton.forget()
+    for widget in window.winfo_children():
+        widget.destroy()
 
     login_text = ttk.Label(window, text="Login")
     login_text.pack(pady=100, padx=300)
+    login_text.configure(takefocus=0)
 
     # Login Text Boxes
     user_label = ttk.Label(window, text="Username")
     user_label.pack()
-    username = Text(window, width=20, height=1)
+    user_label.configure(takefocus=0)
+
+    username = Entry(window, width=25, justify=CENTER)
     username.pack()
+    username.focus_set()
 
     pass_label = ttk.Label(window, text="Password")
     pass_label.pack()
-    password = Entry(window, width=25, show='*')
+    pass_label.configure(takefocus=0)
+
+    password = Entry(window, width=25, show='*',justify=CENTER)
     password.pack()
 
     submit_button = Button(window, text="Submit", command=submit)
@@ -146,13 +163,14 @@ content = ttk.Frame(window)
 
 def submit():
     global fail_text, login_text, submit_button
-    uName = username.get("1.0", END).strip()
+    uName = username.get().strip()
     pWord = password.get().strip()
-    login_text.forget()
+
     # print(f"Information submitted, please wait for verification {uName} and password {pWord}")
     if connection.verifyAccount(uName, pWord):
         if fail_text:
             fail_text.forget()
+        login_text.forget()
         result = connection.getAccount(uName)
         # print(result)
         user = account.Account(result[0][0], result[0][1], result[0][4], result[0][5], result[0][2], result[0][3])
@@ -198,35 +216,32 @@ def renderHomeScreen(user):
     transaction_history.grid(row=3, column=5, columnspan=2, ipadx=145, ipady=10, padx=30)
 
     displayTransactions(user.account_number, "show")
+    logOut = tkinter.Button(window, text="Logout", command=logout, background="grey")
+    logOut.grid(row=16,column=6, columnspan=1, pady=10)
 
-    widgets = [user_label, add_transaction, sort_transactions, edit_transaction, transaction_history]
-
-    # logOut = tkinter.Button(window, text="Logout", command=lambda :cleanLogin)
-    # logOut.grid(row=16, columnspan=6)
-
-def cleanLogin():
-    window.destroy()
-    window.title("Finance App")
-    window.geometry(GEOMETRY_DEFAULT)
-
-    window.resizable(False, False)
-
-    login_text = ttk.Label(window, text="Login")
-    login_text.pack(pady=100, padx=300)
-
-    # Login Text Boxes
-    user_label = ttk.Label(window, text="Username")
-    user_label.pack()
-    username = Text(window, width=20, height=1)
-    username.pack()
-
-    pass_label = ttk.Label(window, text="Password")
-    pass_label.pack()
-    password = Entry(window, width=25, show='*')
-    password.pack()
-
-    submit_button = Button(window, text="Submit", command=submit)
-    submit_button.pack(pady=20)
+# def cleanLogin():
+#     window.destroy()
+#     window.title("Finance App")
+#     window.geometry(GEOMETRY_DEFAULT)
+#
+#     window.resizable(False, False)
+#
+#     login_text = ttk.Label(window, text="Login")
+#     login_text.pack(pady=100, padx=300)
+#
+#     # Login Text Boxes
+#     user_label = ttk.Label(window, text="Username")
+#     user_label.pack()
+#     username = Text(window, width=20, height=1)
+#     username.pack()
+#
+#     pass_label = ttk.Label(window, text="Password")
+#     pass_label.pack()
+#     password = Entry(window, width=25, show='*')
+#     password.pack()
+#
+#     submit_button = Button(window, text="Submit", command=submit)
+#     submit_button.pack(pady=20)
 
 
     # chron_sort = ttk.Button(window, text="Oldest to Newest", command=lambda: print("Old - New"))
@@ -251,7 +266,7 @@ def displayTransactions(num, action):
     data_label.grid(row=5, column=5, columnspan=2)
     balance_label = ttk.Label(window, text=f"Balance: ${connection.getBalance(num)}", font=("Arial", 10),
                               justify=CENTER)
-    balance_label.grid(row=4, column=6)
+    balance_label.grid(row=4, column=5, columnspan=2)
 
     if action == "show":
         transactions = connection.getTransactions(num)
@@ -276,6 +291,7 @@ def displayTransactions(num, action):
         Stransvar = StringVar(value=transactions)
         Sviewer = Listbox(window, listvariable=Stransvar, width=30, height=2, font=("Arial", 10), justify=CENTER)
         Sviewer.grid(row=6, column=5, rowspan=8, columnspan=2, ipadx=25, ipady=100)
+
 
 
 def sorter(num):
@@ -322,25 +338,25 @@ def addTransaction(num):
     retailer_label = Label(new, text=f"Retailer", font=("Arial", 10))
     retailer_label.grid(row=2, column=0, columnspan=2, pady=10, padx=50)
 
-    retailerBox = Text(new, width=20, height=1)
+    retailerBox = Entry(new, width=20)
     retailerBox.grid(row=3, column=0, padx=50, pady=5)
 
     amount_label = Label(new, text="Amount", font=("Arial", 10))
     amount_label.grid(row=4, column=0, columnspan=2, pady=10)
 
-    amountBox = Text(new, width=20, height=1)
+    amountBox = Entry(new, width=20)
     amountBox.grid(row=5, column=0, padx=50, pady=5)
 
     Date_label = Label(new, text="Date (YYYY-MM-DD)", font=("Arial", 10))
     Date_label.grid(row=6, column=0, columnspan=2, pady=10)
 
-    DateBox = Text(new, width=20, height=1)
+    DateBox = Entry(new, width=20)
     DateBox.grid(row=7, column=0, padx=50, pady=5)
 
     correct = Button(new, text="Submit",
-                     command=lambda: confirmAdd(num, retailerBox.get("1.0", END),
-                                                amountBox.get("1.0", END),
-                                                DateBox.get("1.0", END), new))
+                     command=lambda: confirmAdd(num, retailerBox.get().strip(),
+                                                amountBox.get().strip(),
+                                                DateBox.get().strip(), new))
     correct.grid(row=8, column=0, columnspan=2, pady=10)
 
 
@@ -350,32 +366,33 @@ global numberBox
 def editor(num):
     global username
     number_label = Label(window, text="Transaction Number: ", font=("Arial", 10))
-    number_label.grid(row=12, column=0, columnspan=2)
+    number_label.grid(row=12, column=0, columnspan=2, rowspan=2)
 
-    username = Text(window, width=15, height=1, font=("Arial", 10))
+    username = Entry(window, width=20, justify=CENTER)
     username.grid(row=13, column=0, columnspan=1, padx=10)
 
     submitButton = ttk.Button(window, text="edit", command=lambda: editTransaction(num))
     submitButton.grid(row=13, column=1, ipadx=5)
 
 
-def confirmEdit(num, trans_id, retailer, amount, date, pane):
+def confirmEdit(num, trans_id, retailer, amount, dateT, pane):
     amount = amount.strip()
     retailer = retailer.strip()
-    date = date.strip()
+    dateT = dateT.strip()
     tran = connection.getTransaction(trans_id)
 
     if retailer == "":
         retailer = tran[5]
     if amount == "":
         amount = tran[4]
-    if date == "":
-        dateStr = tran[1]
+    if dateT == "":
+        dateStr = datetime.strptime(str(tran[1]), "%Y-%m-%d").date()
     else:
-        dateStr = datetime.strptime(date, "%Y-%m-%d").date()
+        dateStr = datetime.strptime(dateT, "%Y-%m-%d").date()
 
     if dateStr > date.today():
-        fail_text = Label(pane, text="Sorry, you are not authorized to do that.")
+        fail_text = Label(pane, text="Please check the date")
+        fail_text.grid(row=8,column=0,columnspan=2)
         return
 
     connection.editTransaction(trans_id, retailer, amount, dateStr)
@@ -384,7 +401,7 @@ def confirmEdit(num, trans_id, retailer, amount, date, pane):
 
 def editTransaction(accountNumber):
     global fail_text, username
-    id = username.get("1.0", END).strip()
+    id = username.get().strip()
     new = Toplevel(window)
     new.title("Edit Transaction")
     new.geometry("300x350")
@@ -401,31 +418,40 @@ def editTransaction(accountNumber):
     data_label.grid(row=2, column=0, columnspan=2, pady=20, padx=50)
 
     retailer_label = Label(new, text="Retailer", font=("Arial", 10))
-    retailer_label.grid(row=3, column=0)
+    retailer_label.grid(row=3, column=0, pady=10)
 
-    retailerBox = Text(new, width=7, height=1)
-    retailerBox.grid(row=3, column=1)
+    retailerBox = Entry(new, width=10)
+    retailerBox.grid(row=3, column=1, ipadx=20)
 
     amount_label = Label(new, text="Amount", font=("Arial", 10))
-    amount_label.grid(row=4, column=0, pady=20)
+    amount_label.grid(row=4, column=0, pady=10)
 
-    amountBox = Text(new, width=7, height=1)
-    amountBox.grid(row=4, column=1, padx=10, pady=20)
+    amountBox = Entry(new, width=10)
+    amountBox.grid(row=4, column=1, ipadx=20, padx=10)
 
     date_label = Label(new, text="Date", font=("Arial", 10))
-    date_label.grid(row=5, column=0, pady=20)
+    date_label.grid(row=5, column=0, pady=10)
 
-    dateBox = Text(new, width=7, height=1)
-    dateBox.grid(row=5, column=1, ipadx=20, pady=20)
+    dateBox = Entry(new, width=10)
+    dateBox.grid(row=5, column=1, ipadx=20)
 
     correct = Button(new, text="Submit",
-                     command=lambda: confirmEdit(accountNumber, id, retailerBox.get("1.0", END), amountBox.get("1.0", END).strip(),
-                                                 str(dateBox.get("1.0", END)).strip(),new))
+                     command=lambda: confirmEdit(accountNumber, id, retailerBox.get().strip(), amountBox.get().strip(),
+                                                 dateBox.get().strip(),new))
     correct.grid(row=6, column=0, columnspan=2, pady=20)
 
 def getSessionTime():
     return round(time.time() - startTime, 2)
 
+def logout():
+    global fail_text
+
+    for widget in window.winfo_children():
+        widget.destroy()
+
+    fail_text = None
+
+    renderLoginScreen()
 
 # Session tracker
 
