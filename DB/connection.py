@@ -118,23 +118,22 @@ def getTransactions(num):
     return transactions
 
 
-def sortTransactionsRetailer(num):
-    transactions = getTransactions(num)
-    sortedTransactions = []
-    for i in range(len(transactions)):
-        if i == 0:
-            pass
+# def sortTransactionsRetailer(num):
+#     transactions = getTransactions(num)
+#     sortedTransactions = []
+#     for i in range(len(transactions)):
+#         if i == 0:
+#             pass
 
 
 def sortTransactionsAmount(num):
     transactions = getTransactions(num)
-
-    for i in range(1, len(transactions)):
+    for i in range(len(transactions)):
         key = transactions[i]
-        key_amount = float(key.split(", ")[1][1:])
+        key_amount = float(key.split(", ")[2][1:])
         j = i - 1
         while j >= 0:
-            current_amount = float(transactions[j].split(", ")[1][1:])
+            current_amount = float(transactions[j].split(", ")[2][1:])
             if current_amount > key_amount:
                 transactions[j + 1] = transactions[j]
                 j -= 1
@@ -151,14 +150,13 @@ def sortTransactionsDate(num):
     for i in range(1, len(transactions)):
         key = transactions[i]
 
-        # Extract and parse the date from the key
-        key_str = key.split(", ")[2]
-        date_str = datetime.strptime(key_str, "%x")
+        key_str = key.split(", ")[3]
+        date_str = datetime.strptime(key_str,"%Y-%m-%d").date()
         j = i - 1
 
         while j >= 0:
-            current_date_str = transactions[j].split(", ")[2]
-            current_date = datetime.strptime(current_date_str, "%x")
+            current_date_str = transactions[j].split(", ")[3]
+            current_date = datetime.strptime(current_date_str,"%Y-%m-%d").date()
 
             if current_date > date_str:
                 transactions[j + 1] = transactions[j]
@@ -169,14 +167,15 @@ def sortTransactionsDate(num):
         transactions[j + 1] = key
 
         transactions[j + 1] = key
-    print(transactions)
+    # print(transactions)
+    return transactions
 
 
 def addTransaction(num, spent, seller, date):
     db = getConnection()
     mycursor = db.cursor()
     mycursor.execute(f"INSERT INTO transactions (dateDone,accountNumber,amount,retailer)"
-                     f" VALUES ('{str(date).strip()}',{num},{spent},'{str(seller).strip()}')")
+                     f" VALUES ('{str(date)}',{num},{spent},'{str(seller)}')")
     mydb.commit()
 
 

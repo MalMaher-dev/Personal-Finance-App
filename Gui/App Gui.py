@@ -1,5 +1,5 @@
 import tkinter
-from datetime import datetime
+from datetime import *
 from tkinter import *
 from tkinter import ttk
 import re
@@ -103,6 +103,7 @@ NewSubmit_button.pack()
 
 
 def renderLoginScreen():
+    # print(connection.getTransactions(9521))
     global user_label, username, pass_label, password, firstName, lastName, login_text, submit_button
     registration_text.forget()
     user_label.forget()
@@ -190,7 +191,7 @@ def renderHomeScreen(user):
     sort_transactions.grid(row=6, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=(30, 0))
 
     edit_transaction = ttk.Button(window, text="Edit Transaction", command=lambda: editor(user.account_number))
-    edit_transaction.grid(row=10, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=50)
+    edit_transaction.grid(row=11, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=50)
 
     transaction_history = ttk.Button(window, text="Transaction History",
                                      command=lambda: displayTransactions(user.account_number, "show"))
@@ -291,18 +292,30 @@ def sorter(num):
                              command=lambda: displayTransactions(num, "sortAmount"))
     sort_amount.grid(row=9, column=0, columnspan=2, rowspan=1, ipadx=15)
 
+    sort_amount = ttk.Button(window, text="By Date",
+                             command=lambda: displayTransactions(num, "sortDate"))
+    sort_amount.grid(row=10, column=0, columnspan=2, rowspan=1, ipadx=15)
 
-def confirmAdd(num, retailer, amount, date, pane):
-    connection.addTransaction(num, amount, retailer, date)
+
+def confirmAdd(num, retailer, amount, dateStr, pane):
+    dateStr = datetime.strptime(dateStr.strip(), "%Y-%m-%d").date()
+    retailer = retailer.strip()
+
+    if dateStr > date.today():
+        fail_text = Label(pane, text="Please check the date")
+        fail_text.grid(row=9,column=0,columnspan=2)
+        return
+
+    connection.addTransaction(num, amount, retailer, dateStr)
     displayTransactions(num, "show")
-    print(f"{num},{amount},{retailer},{date}")
+    # print(f"{num},{amount},{retailer},{date}")
     pane.destroy()
 
 
 def addTransaction(num):
     new = Toplevel(window)
     new.title("New Transaction")
-    new.geometry("300x300")
+    new.geometry("300x400")
 
     Label(new, text="Enter transaction data to add").grid(row=0, column=0, columnspan=2, ipadx=50)
 
@@ -347,18 +360,17 @@ def editor(num):
 
 
 def confirmEdit(num, trans_id, retailer, amount, date, pane):
-
     amount = amount.strip()
     retailer = retailer.strip()
     date = date.strip()
     tran = connection.getTransaction(trans_id)
 
     if retailer == "":
-        retailer = tran[5]  # assuming index 2 is retailer
+        retailer = tran[5]
     if amount == "":
         amount = tran[4]
     if date == "":
-        dateStr = tran[1]  # already a date object
+        dateStr = tran[1]
     else:
         dateStr = datetime.strptime(date, "%Y-%m-%d").date()
 
