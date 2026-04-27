@@ -15,26 +15,6 @@ GEOMETRY_DEFAULT = "800x600"
 fail_text = None
 
 
-#
-# def sortByAccount():
-#     # account_id = Text(window, width=20, height=1)
-#     # account_id.pack()
-#     transactions = connection.getTransactions(9521)
-#     sorted_transactions1 = []
-#     sorted_transactions2 = []
-#     for t in range(len(transactions)):
-#         line_split = transactions[t].split(',')
-#         if line_split[1] == 'dateCreated':
-#             pass
-#         elif line_split[1] == '0':
-#             sorted_transactions1.append(transactions[t])
-#         else:
-#             sorted_transactions2.append(transactions[t])
-#     for i in range(len(sorted_transactions2)):
-#         sorted_transactions1.append(sorted_transactions2[i])
-#     return sorted_transactions1
-
-
 def getCurrentGeometry():
     wGeo = re.split(r'[x,+]', window.geometry())
     windowW = wGeo[0]
@@ -366,16 +346,27 @@ def editor(num):
     submitButton.grid(row=13, column=1, ipadx=5)
 
 
-def confirmEdit(num, trans_id, amount, date, pane):
+def confirmEdit(num, trans_id, retailer, amount, date, pane):
+
     amount = amount.strip()
+    retailer = retailer.strip()
+    date = date.strip()
     tran = connection.getTransaction(trans_id)
 
+    if retailer == "":
+        retailer = tran[5]  # assuming index 2 is retailer
     if amount == "":
-        amount = tran[3]
+        amount = tran[4]
     if date == "":
-        date = tran[4]
-    dateStr = datetime.strptime(date, "%Y-%m-%d").date()
-    connection.editTransaction(trans_id, amount, dateStr)
+        dateStr = tran[1]  # already a date object
+    else:
+        dateStr = datetime.strptime(date, "%Y-%m-%d").date()
+
+    if dateStr > date.today():
+        fail_text = Label(pane, text="Sorry, you are not authorized to do that.")
+        return
+
+    connection.editTransaction(trans_id, retailer, amount, dateStr)
     displayTransactions(num, "show")
     pane.destroy()
 
@@ -384,7 +375,7 @@ def editTransaction(accountNumber):
     id = username.get("1.0", END).strip()
     new = Toplevel(window)
     new.title("Edit Transaction")
-    new.geometry("300x300")
+    new.geometry("300x350")
 
     Label(new, text="Enter new amount").grid(row=0, column=0, columnspan=2, ipadx=50)
 
@@ -397,20 +388,26 @@ def editTransaction(accountNumber):
     data_label = Label(new, text=f"{transData}", font=("Arial", 10))
     data_label.grid(row=2, column=0, columnspan=2, pady=20, padx=50)
 
+    retailer_label = Label(new, text="Retailer", font=("Arial", 10))
+    retailer_label.grid(row=3, column=0)
+
+    retailerBox = Text(new, width=7, height=1)
+    retailerBox.grid(row=3, column=1)
+
     amount_label = Label(new, text="Amount", font=("Arial", 10))
-    amount_label.grid(row=3, column=0, pady=20)
+    amount_label.grid(row=4, column=0, pady=20)
 
     amountBox = Text(new, width=7, height=1)
-    amountBox.grid(row=3, column=1, padx=10, pady=20)
+    amountBox.grid(row=4, column=1, padx=10, pady=20)
 
     date_label = Label(new, text="Date", font=("Arial", 10))
-    date_label.grid(row=4, column=0, pady=20)
+    date_label.grid(row=5, column=0, pady=20)
 
     dateBox = Text(new, width=7, height=1)
-    dateBox.grid(row=4, column=1, ipadx=20, pady=20)
+    dateBox.grid(row=5, column=1, ipadx=20, pady=20)
 
     correct = Button(new, text="Submit",
-                     command=lambda: confirmEdit(accountNumber, id, amountBox.get("1.0", END).strip(),
+                     command=lambda: confirmEdit(accountNumber, id, retailerBox.get("1.0", END), amountBox.get("1.0", END).strip(),
                                                  str(dateBox.get("1.0", END)).strip(),new))
     correct.grid(row=6, column=0, columnspan=2, pady=20)
 
