@@ -27,10 +27,10 @@ def getCurrentGeometry():
 def submitNewUser():
     global username, password, firstName, lastName, fail_text
 
-    uName = username.get("1.0", END).strip()
+    uName = username.get().strip()
     pWord = password.get().strip()
-    fName = firstName.get("1.0", END).strip()
-    lName = lastName.get("1.0", END).strip()
+    fName = firstName.get().strip()
+    lName = lastName.get().strip()
     account_id = random.randint(0, 9999)
     fields = [uName, pWord, fName, lName]
     # print(f"{uName}, {pWord}, {fName}, {lName}, {account_id}")
@@ -82,7 +82,7 @@ user_label = ttk.Label(window, text="Enter a Username")
 user_label.pack()
 user_label.configure(takefocus=0)
 
-username = Entry(window, width=25)
+username = Entry(window, width=25, justify=CENTER)
 username.pack()
 username.focus()
 
@@ -90,21 +90,21 @@ pass_label = ttk.Label(window, text="Enter a Password")
 pass_label.pack()
 pass_label.configure(takefocus=0)
 
-password = Entry(window, width=25, show='*')
+password = Entry(window, width=25, show='*',  justify=CENTER)
 password.pack()
 
 firstName_label = ttk.Label(window, text="Enter a First Name")
 firstName_label.pack()
 firstName_label.configure(takefocus=0)
 
-firstName = Entry(window, width=25)
+firstName = Entry(window, width=25,  justify=CENTER)
 firstName.pack()
 
 lastName_label = ttk.Label(window, text="Enter a Last Name")
 lastName_label.pack()
 lastName_label.configure(takefocus=0)
 
-lastName = Entry(window, width=25)
+lastName = Entry(window, width=25,  justify=CENTER)
 lastName.pack()
 
 NewSubmit_button = tkinter.Button(window, text="Submit",command=submitNewUser)
@@ -216,7 +216,7 @@ def renderHomeScreen(user):
     transaction_history.grid(row=3, column=5, columnspan=2, ipadx=145, ipady=10, padx=30)
 
     displayTransactions(user.account_number, "show")
-    logOut = tkinter.Button(window, text="Logout", command=logout, background="grey")
+    logOut = tkinter.Button(window, text="Logout", command=logout)
     logOut.grid(row=16,column=6, columnspan=1, pady=10)
 
 # def cleanLogin():
@@ -338,19 +338,19 @@ def addTransaction(num):
     retailer_label = Label(new, text=f"Retailer", font=("Arial", 10))
     retailer_label.grid(row=2, column=0, columnspan=2, pady=10, padx=50)
 
-    retailerBox = Entry(new, width=20)
+    retailerBox = Entry(new, width=20, justify=CENTER)
     retailerBox.grid(row=3, column=0, padx=50, pady=5)
 
     amount_label = Label(new, text="Amount", font=("Arial", 10))
     amount_label.grid(row=4, column=0, columnspan=2, pady=10)
 
-    amountBox = Entry(new, width=20)
+    amountBox = Entry(new, width=20, justify=CENTER)
     amountBox.grid(row=5, column=0, padx=50, pady=5)
 
     Date_label = Label(new, text="Date (YYYY-MM-DD)", font=("Arial", 10))
     Date_label.grid(row=6, column=0, columnspan=2, pady=10)
 
-    DateBox = Entry(new, width=20)
+    DateBox = Entry(new, width=20,  justify=CENTER)
     DateBox.grid(row=7, column=0, padx=50, pady=5)
 
     correct = Button(new, text="Submit",
