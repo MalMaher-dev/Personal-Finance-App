@@ -281,7 +281,6 @@ def renderHomeScreen(user):
 listbox_frame = None
 
 
-
 def displayTransactions(num, action):
     global listbox_frame
 
