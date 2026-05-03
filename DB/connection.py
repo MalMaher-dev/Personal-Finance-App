@@ -9,7 +9,7 @@ from mysql.connector import Error
 def connectToMySQL():
     database = mysql.connector.connect(
         host="127.0.0.1",
-        port="3306",
+        port="3307",
         user="guest",
         password="psssword",
         database="project",
@@ -113,17 +113,9 @@ def getTransactions(num):
     result = mycursor.fetchall()
     for index in result:
         dataline = f"{index[3]}, {index[5]}, ${index[4]}, {index[1]}"
-        transactions.append(dataline)
+        transactions.append(dataline.split(","))
         # print(index)
     return transactions
-
-
-# def sortTransactionsRetailer(num):
-#     transactions = getTransactions(num)
-#     sortedTransactions = []
-#     for i in range(len(transactions)):
-#         if i == 0:
-#             pass
 
 
 def sortTransactionsAmount(num):
@@ -151,12 +143,12 @@ def sortTransactionsDate(num):
         key = transactions[i]
 
         key_str = key.split(", ")[3]
-        date_str = datetime.strptime(key_str,"%Y-%m-%d").date()
+        date_str = datetime.strptime(key_str, "%Y-%m-%d").date()
         j = i - 1
 
         while j >= 0:
             current_date_str = transactions[j].split(", ")[3]
-            current_date = datetime.strptime(current_date_str,"%Y-%m-%d").date()
+            current_date = datetime.strptime(current_date_str, "%Y-%m-%d").date()
 
             if current_date > date_str:
                 transactions[j + 1] = transactions[j]
@@ -179,11 +171,11 @@ def addTransaction(num, spent, seller, date):
     mydb.commit()
 
 
-
 def editTransaction(transaction_id, retailer, amount, date):
     db = getConnection()
     mycursor = db.cursor()
-    mycursor.execute(f"Update transactions SET retailer = '{retailer}', amount = {amount},dateDone = '{date}' WHERE transactionNumber = {transaction_id}")
+    mycursor.execute(
+        f"Update transactions SET retailer = '{retailer}', amount = {amount},dateDone = '{date}' WHERE transactionNumber = {transaction_id}")
     mydb.commit()
 
 

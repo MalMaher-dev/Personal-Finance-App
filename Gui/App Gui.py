@@ -90,24 +90,24 @@ pass_label = ttk.Label(window, text="Enter a Password")
 pass_label.pack()
 pass_label.configure(takefocus=0)
 
-password = Entry(window, width=25, show='*',  justify=CENTER)
+password = Entry(window, width=25, show='*', justify=CENTER)
 password.pack()
 
 firstName_label = ttk.Label(window, text="Enter a First Name")
 firstName_label.pack()
 firstName_label.configure(takefocus=0)
 
-firstName = Entry(window, width=25,  justify=CENTER)
+firstName = Entry(window, width=25, justify=CENTER)
 firstName.pack()
 
 lastName_label = ttk.Label(window, text="Enter a Last Name")
 lastName_label.pack()
 lastName_label.configure(takefocus=0)
 
-lastName = Entry(window, width=25,  justify=CENTER)
+lastName = Entry(window, width=25, justify=CENTER)
 lastName.pack()
 
-NewSubmit_button = tkinter.Button(window, text="Submit",command=submitNewUser)
+NewSubmit_button = tkinter.Button(window, text="Submit", command=submitNewUser)
 NewSubmit_button.pack()
 
 
@@ -145,7 +145,7 @@ def renderLoginScreen():
     pass_label.pack()
     pass_label.configure(takefocus=0)
 
-    password = Entry(window, width=25, show='*',justify=CENTER)
+    password = Entry(window, width=25, show='*', justify=CENTER)
     password.pack()
 
     submit_button = Button(window, text="Submit", command=submit)
@@ -153,7 +153,7 @@ def renderLoginScreen():
 
 
 loginOptionButton = tkinter.Button(window, text="If you already have an account", command=renderLoginScreen,
-                                relief=tkinter.RIDGE, borderwidth=2)
+                                   relief=tkinter.RIDGE, borderwidth=2)
 loginOptionButton.pack()
 content = ttk.Frame(window)
 
@@ -199,25 +199,43 @@ def submit():
 
 
 def renderHomeScreen(user):
+    for row in range(17):
+        window.grid_rowconfigure(row, minsize=30)
+
+    # Give columns fixed weights so they don't collapse
+    window.grid_columnconfigure(0, minsize=80)
+    window.grid_columnconfigure(1, minsize=80)
+    window.grid_columnconfigure(5, minsize=80)
+    window.grid_columnconfigure(6, minsize=80)
+
     user_label = ttk.Label(window, text=f"Hello {user.first_name},", font=("Arial", 20))
     user_label.grid(row=0, column=0, columnspan=2, rowspan=2, ipadx=40, ipady=10, padx=30, pady=30)
 
     add_transaction = ttk.Button(window, text="Add Transaction", command=lambda: addTransaction(user.account_number))
-    add_transaction.grid(row=3, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10)
+    add_transaction.grid(row=3, column=0, columnspan=2, ipadx=20, ipady=10)
 
-    sort_transactions = ttk.Button(window, text="Sort Transactions", command=lambda: sorter(user.account_number))
-    sort_transactions.grid(row=6, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=(30, 0))
+    listbox_ref = [None]
 
-    edit_transaction = ttk.Button(window, text="Edit Transaction", command=lambda: editor(user.account_number))
-    edit_transaction.grid(row=11, column=0, columnspan=2, rowspan=2, ipadx=20, ipady=10, pady=50)
+    def refresh(action="show"):
+        listbox_ref[0] = displayTransactions(user.account_number, action)
+
+    sort_transactions = ttk.Button(window, text="Sort Transactions",
+                                   command=lambda: sorter(user.account_number))
+    sort_transactions.grid(row=6, column=0, columnspan=2, ipadx=20, ipady=10, pady=(30, 0))
+
+    edit_transaction = ttk.Button(window, text="Edit Transaction",
+                                  command=lambda: editTransaction(user.account_number, listbox_ref[0]))
+    edit_transaction.grid(row=11, column=0, columnspan=2, ipadx=20, ipady=10)
 
     transaction_history = ttk.Button(window, text="Transaction History",
-                                     command=lambda: displayTransactions(user.account_number, "show"))
+                                     command=lambda: refresh("show"))
     transaction_history.grid(row=3, column=5, columnspan=2, ipadx=145, ipady=10, padx=30)
 
-    displayTransactions(user.account_number, "show")
+    refresh("show")
+
     logOut = tkinter.Button(window, text="Logout", command=logout)
-    logOut.grid(row=16,column=6, columnspan=1, pady=10)
+    logOut.grid(row=16, column=6, columnspan=1, pady=10)
+
 
 # def cleanLogin():
 #     window.destroy()
@@ -244,66 +262,76 @@ def renderHomeScreen(user):
 #     submit_button.pack(pady=20)
 
 
-    # chron_sort = ttk.Button(window, text="Oldest to Newest", command=lambda: print("Old - New"))
-    # chron_sort.grid(row=4, column=5, ipadx=50)
+# chron_sort = ttk.Button(window, text="Oldest to Newest", command=lambda: print("Old - New"))
+# chron_sort.grid(row=4, column=5, ipadx=50)
 
-    # for row in range(7):
-    #     for col in range(10):
-    #         Button(
-    #             window,
-    #             text=f"Cell ({row}, {col})",
-    #             width=10,
-    #             height=5,
-    #         ).grid(row=row, column=col)
+# for row in range(7):
+#     for col in range(10):
+#         Button(
+#             window,
+#             text=f"Cell ({row}, {col})",
+#             width=10,
+#             height=5,
+#         ).grid(row=row, column=col)
 
-    # View_button = ttk.Button(window, text="View Transactions",
-    #                          command=lambda: displayTransactions(int(user.account_number)))
-    # View_button.grid(row=0, column=1, columnspan=2)
+# View_button = ttk.Button(window, text="View Transactions",
+#                          command=lambda: displayTransactions(int(user.account_number)))
+# View_button.grid(row=0, column=1, columnspan=2)
+
+listbox_frame = None
+
 
 
 def displayTransactions(num, action):
-    data_label = ttk.Label(window, text=f"Transaction #, Retailer, Amount Spent, Date", font=("Arial", 10))
-    data_label.grid(row=5, column=5, columnspan=2)
+    global listbox_frame
+
     balance_label = ttk.Label(window, text=f"Balance: ${connection.getBalance(num)}", font=("Arial", 10),
                               justify=CENTER)
     balance_label.grid(row=4, column=5, columnspan=2)
 
+    if listbox_frame:
+        listbox_frame.destroy()
+
+    transactions = []
     if action == "show":
         transactions = connection.getTransactions(num)
-        Stransvar = StringVar(value=transactions)
-        Sviewer = Listbox(window, listvariable=Stransvar, width=30, height=2, font=("Arial", 10), justify=CENTER)
-        Sviewer.grid(row=6, column=5, rowspan=8, columnspan=2, ipadx=25, ipady=100)
-
     elif action == "sortDate":
         transactions = connection.sortTransactionsDate(num)
-        Stransvar = StringVar(value=transactions)
-        Sviewer = Listbox(window, listvariable=Stransvar, width=30, height=2, font=("Arial", 10), justify=CENTER)
-        Sviewer.grid(row=6, column=5, rowspan=8, columnspan=2, ipadx=25, ipady=100)
-
-    elif action == "sortRetailer":
-        transactions = connection.sortTransactionsRetailer(num)
-        Stransvar = StringVar(value=transactions)
-        Sviewer = Listbox(window, listvariable=Stransvar, width=30, height=2, font=("Arial", 10), justify=CENTER)
-        Sviewer.grid(row=6, column=5, rowspan=8, columnspan=2, ipadx=25, ipady=100)
-
     elif action == "sortAmount":
         transactions = connection.sortTransactionsAmount(num)
-        Stransvar = StringVar(value=transactions)
-        Sviewer = Listbox(window, listvariable=Stransvar, width=30, height=2, font=("Arial", 10), justify=CENTER)
-        Sviewer.grid(row=6, column=5, rowspan=8, columnspan=2, ipadx=25, ipady=100)
 
+    listbox_frame = Frame(window)
+    listbox_frame.grid(row=5, column=5, rowspan=10, columnspan=2, padx=10, pady=5, sticky=NW)
+
+    scrollbar = ttk.Scrollbar(listbox_frame, orient=VERTICAL)
+    scrollbar.pack(side=RIGHT, fill=Y)
+
+    tree = ttk.Treeview(listbox_frame,
+                        columns=("id", "retailer", "amount", "date"),
+                        show="headings",
+                        height=12,
+                        yscrollcommand=scrollbar.set)
+    scrollbar.config(command=tree.yview)
+
+    tree.heading("id", text="#")
+    tree.heading("retailer", text="Retailer")
+    tree.heading("amount", text="Amount")
+    tree.heading("date", text="Date")
+
+    tree.column("id", width=50, anchor=CENTER)
+    tree.column("retailer", width=120, anchor=W)
+    tree.column("amount", width=80, anchor=E)
+    tree.column("date", width=100, anchor=CENTER)
+
+    tree.pack(side=LEFT, fill=BOTH, expand=True)
+
+    for t in transactions:
+        tree.insert("", END, values=(t[0], t[1], f"${t[2]}", t[3]))
+
+    return tree
 
 
 def sorter(num):
-    #
-    # sort_date = ttk.Button(window, text="By Date",
-    #                        command=lambda: connection.sortTransactionsDate(num))
-    # sort_date.grid(row=7, column=0, columnspan=2, rowspan=2, ipadx=10, ipady=10, pady=30)
-
-    # sort_retailer = ttk.Button(window, text="By Retailer",
-    #                            command=lambda: print("Undone"))
-    # sort_retailer.grid(row=8, column=0, columnspan=2, rowspan=1, ipadx=25)
-
     sort_amount = ttk.Button(window, text="By Amount (Asc)",
                              command=lambda: displayTransactions(num, "sortAmount"))
     sort_amount.grid(row=9, column=0, columnspan=2, rowspan=1, ipadx=15)
@@ -319,7 +347,7 @@ def confirmAdd(num, retailer, amount, dateStr, pane):
 
     if dateStr > date.today():
         fail_text = Label(pane, text="Please check the date")
-        fail_text.grid(row=9,column=0,columnspan=2)
+        fail_text.grid(row=9, column=0, columnspan=2)
         return
 
     connection.addTransaction(num, amount, retailer, dateStr)
@@ -350,7 +378,7 @@ def addTransaction(num):
     Date_label = Label(new, text="Date (YYYY-MM-DD)", font=("Arial", 10))
     Date_label.grid(row=6, column=0, columnspan=2, pady=10)
 
-    DateBox = Entry(new, width=20,  justify=CENTER)
+    DateBox = Entry(new, width=20, justify=CENTER)
     DateBox.grid(row=7, column=0, padx=50, pady=5)
 
     correct = Button(new, text="Submit",
@@ -368,10 +396,10 @@ def editor(num):
     number_label = Label(window, text="Transaction Number: ", font=("Arial", 10))
     number_label.grid(row=12, column=0, columnspan=2, rowspan=2)
 
-    username = Entry(window, width=20, justify=CENTER)
-    username.grid(row=13, column=0, columnspan=1, padx=10)
+    # username = Entry(window, width=20, justify=CENTER)
+    # username.grid(row=13, column=0, columnspan=1, padx=10)
 
-    submitButton = ttk.Button(window, text="edit", command=lambda: editTransaction(num))
+    submitButton = ttk.Button(window, text="edit", command=lambda: editTransaction(num), )
     submitButton.grid(row=13, column=1, ipadx=5)
 
 
@@ -392,16 +420,30 @@ def confirmEdit(num, trans_id, retailer, amount, dateT, pane):
 
     if dateStr > date.today():
         fail_text = Label(pane, text="Please check the date")
-        fail_text.grid(row=8,column=0,columnspan=2)
+        fail_text.grid(row=8, column=0, columnspan=2)
         return
 
     connection.editTransaction(trans_id, retailer, amount, dateStr)
     displayTransactions(num, "show")
     pane.destroy()
 
-def editTransaction(accountNumber):
-    global fail_text, username
-    id = username.get().strip()
+
+def editTransaction(accountNumber, listbox):
+    global fail_text
+
+    if fail_text:
+        fail_text.grid_forget()
+        fail_text = None
+
+    selection = listbox.selection()
+    if not selection:
+        fail_text = ttk.Label(window, text="Please select a transaction to edit")
+        fail_text.grid(row=15, column=0, columnspan=2, pady=5)
+        return
+
+    values = listbox.item(selection[0], "values")
+    id = values[0]
+
     new = Toplevel(window)
     new.title("Edit Transaction")
     new.geometry("300x350")
@@ -437,11 +479,13 @@ def editTransaction(accountNumber):
 
     correct = Button(new, text="Submit",
                      command=lambda: confirmEdit(accountNumber, id, retailerBox.get().strip(), amountBox.get().strip(),
-                                                 dateBox.get().strip(),new))
+                                                 dateBox.get().strip(), new))
     correct.grid(row=6, column=0, columnspan=2, pady=20)
+
 
 def getSessionTime():
     return round(time.time() - startTime, 2)
+
 
 def logout():
     global fail_text
@@ -452,6 +496,7 @@ def logout():
     fail_text = None
 
     renderLoginScreen()
+
 
 # Session tracker
 
