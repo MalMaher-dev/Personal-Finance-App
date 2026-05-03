@@ -194,12 +194,12 @@ def renderHomeScreen(user):
 
     transaction_history = ttk.Button(window, text="Transaction History",
                                      command=lambda: refresh("show"))
-    transaction_history.grid(row=3, column=5, columnspan=2, ipadx=145, ipady=10, padx=30)
+    transaction_history.grid(row=0, column=5, columnspan=2, ipadx=145, ipady=10, padx=30)
 
     refresh("show")
 
     logOut = tkinter.Button(window, text="Logout", command=logout)
-    logOut.grid(row=16, column=6, columnspan=1, pady=10)
+    logOut.grid(row=13, column=6, columnspan=1, pady=10)
 
 
 def sortColumn(tree, col, reverse):
@@ -227,7 +227,7 @@ def displayTransactions(num, action):
 
     balance_label = ttk.Label(window, text=f"Balance: ${connection.getBalance(num)}", font=("Arial", 10),
                               justify=CENTER)
-    balance_label.grid(row=4, column=5, columnspan=2)
+    balance_label.grid(row=1, column=5, columnspan=2)
 
     if listbox_frame:
         listbox_frame.destroy()
@@ -241,7 +241,7 @@ def displayTransactions(num, action):
         transactions = connection.sortTransactionsAmount(num)
 
     listbox_frame = Frame(window)
-    listbox_frame.grid(row=5, column=5, rowspan=10, columnspan=2, padx=60, pady=5, sticky=NW)
+    listbox_frame.grid(row=2, column=5, rowspan=15, columnspan=2, padx=60, pady=5, sticky=NW)
 
     scrollbar = ttk.Scrollbar(listbox_frame, orient=VERTICAL)
     scrollbar.pack(side=RIGHT, fill=Y)
@@ -249,7 +249,7 @@ def displayTransactions(num, action):
     tree = ttk.Treeview(listbox_frame,
                         columns=("id", "retailer", "amount", "date"),
                         show="headings",
-                        height=12,
+                        height=15,
                         yscrollcommand=scrollbar.set)
     scrollbar.config(command=tree.yview)
 
@@ -288,7 +288,7 @@ def confirmAdd(num, retailer, amount, dateStr, pane):
 def addTransaction(num):
     new = Toplevel(window)
     new.title("New Transaction")
-    new.geometry("300x400")
+    new.geometry("275x275")
 
     Label(new, text="Enter transaction data to add").grid(row=0, column=0, columnspan=2, ipadx=50)
 
@@ -296,19 +296,19 @@ def addTransaction(num):
     retailer_label.grid(row=2, column=0, columnspan=2, pady=10, padx=50)
 
     retailerBox = Entry(new, width=20, justify=CENTER)
-    retailerBox.grid(row=3, column=0, padx=50, pady=5)
+    retailerBox.grid(row=3, column=0, padx=60, pady=5)
 
     amount_label = Label(new, text="Amount", font=("Arial", 10))
     amount_label.grid(row=4, column=0, columnspan=2, pady=10)
 
     amountBox = Entry(new, width=20, justify=CENTER)
-    amountBox.grid(row=5, column=0, padx=50, pady=5)
+    amountBox.grid(row=5, column=0, padx=70, pady=5)
 
     Date_label = Label(new, text="Date (YYYY-MM-DD)", font=("Arial", 10))
     Date_label.grid(row=6, column=0, columnspan=2, pady=10)
 
     DateBox = Entry(new, width=20, justify=CENTER)
-    DateBox.grid(row=7, column=0, padx=50, pady=5)
+    DateBox.grid(row=7, column=0, padx=80, pady=5)
 
     correct = Button(new, text="Submit",
                      command=lambda: confirmAdd(num, retailerBox.get().strip(),
@@ -363,7 +363,7 @@ def editTransaction(accountNumber, listbox):
 
     new = Toplevel(window)
     new.title("Edit Transaction")
-    new.geometry("300x350")
+    new.geometry("275x275")
 
     Label(new, text="Enter new amount").grid(row=0, column=0, columnspan=2, ipadx=50)
 
@@ -380,19 +380,19 @@ def editTransaction(accountNumber, listbox):
     retailer_label.grid(row=3, column=0, pady=10)
 
     retailerBox = Entry(new, width=10)
-    retailerBox.grid(row=3, column=1, ipadx=20)
+    retailerBox.grid(row=3, column=1, ipadx=10)
 
     amount_label = Label(new, text="Amount", font=("Arial", 10))
     amount_label.grid(row=4, column=0, pady=10)
 
     amountBox = Entry(new, width=10)
-    amountBox.grid(row=4, column=1, ipadx=20, padx=10)
+    amountBox.grid(row=4, column=1, ipadx=10, padx=10)
 
     date_label = Label(new, text="Date", font=("Arial", 10))
     date_label.grid(row=5, column=0, pady=10)
 
     dateBox = Entry(new, width=10)
-    dateBox.grid(row=5, column=1, ipadx=20)
+    dateBox.grid(row=5, column=1, ipadx=10)
 
     correct = Button(new, text="Submit",
                      command=lambda: confirmEdit(accountNumber, id, retailerBox.get().strip(), amountBox.get().strip(),
@@ -429,10 +429,9 @@ def chart_Transactions(num, action):
     if action == "pie":
         if plt.get_fignums():
             plt.close()
-
         plt.title("Money spent per retailer as a whole")
         plt.pie(y, labels=x, autopct=lambda p: '{:.0f}'.format(p * sum(y) / 100))
-        plt.title(f"Money Spent as a whole: ${round(total,2)}")
+        plt.title(f"Money Spent as a whole: ${round(total, 2)}")
         plt.show()
     else:
         if plt.get_fignums():
@@ -444,8 +443,6 @@ def chart_Transactions(num, action):
         plt.title("Money Spent per Retailer")
         plt.bar(x, y)
         plt.show()
-
-
 
 
 def getSessionTime():
