@@ -8,8 +8,10 @@ from Objects import transaction as transaction
 from Objects import account as account
 import DB.connection as connection
 import random
-
-from Objects.account import Account
+import numpy as np
+import matplotlib.pyplot as plt
+import textwrap
+import Objects.account as Account
 
 GEOMETRY_DEFAULT = "800x600"
 fail_text = None
@@ -39,7 +41,7 @@ def submitNewUser(uName, pWord, fName, lName):
 
     if fail_text:
         fail_text.forget()
-    new_account = account.Account(fName, lName, uName, pWord, balance=0, account_id=account_id)
+    new_account = Account(fName, lName, uName, pWord, balance=0, account_id=account_id)
     connection.addAccount(new_account)
 
     for widget in window.winfo_children():
@@ -150,6 +152,18 @@ def submit():
         fail_text.pack(pady=20)
 
 
+def charter(num):
+    new = Toplevel(window)
+    new.title("Chart/Graph Options")
+    new.geometry("100x100")
+
+    Pie_chart = Button(new, text="Pie Chart", font=("Arial", 10), command=lambda: chart_Transactions(num, "pie"))
+    Pie_chart.grid(row=2, column=0, columnspan=2, pady=10, padx=25)
+
+    Bar_graph = Button(new, text="Bar Graph", font=("Arial", 10), command=lambda: chart_Transactions(num, "bar"))
+    Bar_graph.grid(row=3, column=0, columnspan=2, pady=10, padx=25)
+
+
 def renderHomeScreen(user):
     for row in range(17):
         window.grid_rowconfigure(row, minsize=30)
@@ -173,6 +187,10 @@ def renderHomeScreen(user):
     edit_transaction = ttk.Button(window, text="Edit Transaction",
                                   command=lambda: editTransaction(user.account_number, listbox_ref[0]))
     edit_transaction.grid(row=6, column=0, columnspan=2, ipadx=20, ipady=10)
+
+    chart_Transaction = ttk.Button(window, text="Chart Transactions",
+                                   command=lambda: charter(user.account_number))
+    chart_Transaction.grid(row=9, column=0, columnspan=2, ipadx=20, ipady=10)
 
     transaction_history = ttk.Button(window, text="Transaction History",
                                      command=lambda: refresh("show"))
@@ -380,6 +398,54 @@ def editTransaction(accountNumber, listbox):
                      command=lambda: confirmEdit(accountNumber, id, retailerBox.get().strip(), amountBox.get().strip(),
                                                  dateBox.get().strip(), new))
     correct.grid(row=6, column=0, columnspan=2, pady=20)
+
+
+def chart_Transactions(num, action):
+    action = action.lower()
+    total = 0
+    transactions = connection.getTransactions(num)
+    retailers = []
+    for h in transactions:
+        if h[1] not in retailers:
+            retailers.append(h[1])
+    costPerRetailer = []
+
+    for index in retailers:
+        cost = 0
+        for i in transactions:
+            if i[1] == index:
+                cost += float(i[2].split('$')[1])
+                total += float(i[2].split('$')[1])
+        costPerRetailer.append([index.strip(" "), round(float(cost), 2)])
+
+    x = []
+    y = []
+
+    for i in costPerRetailer:
+        wrappedX = textwrap.fill(i[0], width=10)
+        x = np.append(x, wrappedX)
+        y = np.append(y, i[1])
+
+    if action == "pie":
+        if plt.get_fignums():
+            plt.close()
+
+        plt.title("Money spent per retailer as a whole")
+        plt.pie(y, labels=x, autopct=lambda p: '{:.0f}'.format(p * sum(y) / 100))
+        plt.title(f"Money Spent as a whole: ${round(total,2)}")
+        plt.show()
+    else:
+        if plt.get_fignums():
+            plt.close()
+
+        plt.figure(figsize=(7.5, 6))
+        plt.ylabel("Money Spent ($)")
+        plt.xlabel("Retailer")
+        plt.title("Money Spent per Retailer")
+        plt.bar(x, y)
+        plt.show()
+
+
 
 
 def getSessionTime():
