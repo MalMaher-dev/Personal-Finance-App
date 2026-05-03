@@ -1,7 +1,10 @@
 import random
 import time
+from calendar import Day, Month
+from random import randint
+
 from Objects import account as account
-from datetime import datetime
+from datetime import datetime, date
 import mysql.connector
 from mysql.connector import Error
 
@@ -111,9 +114,11 @@ def getTransactions(num):
     mycursor = db.cursor()
     mycursor.execute(f"SELECT * FROM transactions WHERE accountNumber = {num}")
     result = mycursor.fetchall()
+    count = 1
     for index in result:
-        dataline = f"{index[3]}, {index[5]}, ${index[4]}, {index[1]}"
+        dataline = f"{count}, {index[5]}, ${index[4]}, {index[1]},{index[3]}"
         transactions.append(dataline.split(","))
+        count = count + 1
         # print(index)
     return transactions
 
@@ -194,6 +199,54 @@ def autoGenTransactions():
                          f" VALUES ('{account}',"
                          f" '{random.random() * random.randint(1, 100)}', "
                          f" '{retailers[random.randint(0, len(retailers) - 1)]}');")
+    mydb.commit()
+    print("Transactions generated")
+
+
+def AccountautoGenTransactions(num):
+    db = getConnection()
+    mycursor = db.cursor()
+    retailers = ["Amazon", "Calvin Klein", "Target", "Walmart", "Costco", "Sam's Club", "Aldi's", "Asda"]
+
+
+    for x in range(10):
+        Month = random.randint(1, 12)
+        Year = random.randint(2000, date.today().year)
+        Day = 0
+
+        if Month == 2:
+            if Year % 4 == 0:
+                if Year % 100 == 0:
+                    if Year % 400 == 0:
+                        Day = random.randint(1, 29)
+                else:
+                    Day = random.randint(1, 28)
+            else:
+                Day = random.randint(1, 29)
+        else:
+            if Month == 1 or Month == 3 or Month == 5 or Month == 7 or Month == 8 or Month == 10 or Month == 12:
+                Day = random.randint(1, 31)
+            else:
+                Day = random.randint(1, 30)
+
+        if Month < 10:
+            Month = "0" + str(Month)
+        else:
+            Month = str(Month)
+
+        if Day < 10:
+            Day = "0" + str(Day)
+        else:
+            Day = str(Day)
+
+        dateS = f"{Year}-{Month}-{Day}"
+        dateStr = datetime.strptime(dateS, "%Y-%m-%d").date()
+
+        mycursor.execute(f"INSERT INTO transactions (accountNumber,amount,retailer, dateDone)"
+                         f" VALUES (%s, %s, %s, %s)",
+                         (num, random.random() * random.randint(10, 100),
+                          retailers[random.randint(0, len(retailers) - 1)], dateStr)
+                         )
     mydb.commit()
     print("Transactions generated")
 
