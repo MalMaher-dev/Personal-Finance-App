@@ -155,13 +155,13 @@ def submit():
 def charter(num):
     new = Toplevel(window)
     new.title("Chart/Graph Options")
-    new.geometry("100x100")
+    new.geometry("200x50")
 
     Pie_chart = Button(new, text="Pie Chart", font=("Arial", 10), command=lambda: chart_Transactions(num, "pie"))
-    Pie_chart.grid(row=2, column=0, columnspan=2, pady=10, padx=25)
+    Pie_chart.grid(row=2, column=0, columnspan=2, pady=10, padx=[25, 10])
 
     Bar_graph = Button(new, text="Bar Graph", font=("Arial", 10), command=lambda: chart_Transactions(num, "bar"))
-    Bar_graph.grid(row=3, column=0, columnspan=2, pady=10, padx=25)
+    Bar_graph.grid(row=2, column=2, columnspan=2, pady=10, padx=10)
 
 
 def renderHomeScreen(user):
