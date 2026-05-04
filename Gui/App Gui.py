@@ -17,6 +17,7 @@ import Objects.account as Account
 
 GEOMETRY_DEFAULT = "850x600"
 fail_text = None
+current_treeview = None
 
 
 def getCurrentGeometry():
@@ -54,7 +55,7 @@ def submitNewUser(uName, pWord, fName, lName):
 
 window = Tk()
 
-window.title("Finance App")
+window.title("Budget Buddy")
 window.geometry(GEOMETRY_DEFAULT)
 window.configure(bg="#f5f5f5")
 style = ttk.Style()
@@ -137,11 +138,13 @@ def renderLoginScreen():
 
 def submit():
     global fail_text, login_text, submit_button
+    if fail_text is not None and fail_text.winfo_exists():
+        fail_text.pack_forget()
     uName = username.get().strip()
     pWord = password.get().strip()
     if connection.verifyAccount(uName, pWord):
-        if fail_text:
-            fail_text.forget()
+        if fail_text is not None and fail_text.winfo_exists():
+            fail_text.pack_forget()
         login_text.forget()
         result = connection.getAccount(uName)
         user = account.Account(result[0][0], result[0][1], result[0][4], result[0][5], result[0][2], result[0][3])
@@ -192,7 +195,7 @@ def renderHomeScreen(user):
         listbox_ref[0] = displayTransactions(user.account_number, action)
 
     edit_transaction = ttk.Button(window, text="Edit Transaction",
-                                  command=lambda: editTransaction(user.account_number, listbox_ref[0]))
+                                  command=lambda: editTransaction(user.account_number))
     edit_transaction.grid(row=6, column=0, columnspan=2, ipadx=20, ipady=10)
 
     chart_Transaction = ttk.Button(window, text="Chart Transactions",
@@ -230,7 +233,7 @@ listbox_frame = None
 
 
 def displayTransactions(num, action):
-    global listbox_frame
+    global listbox_frame, current_treeview
 
     balance_label = ttk.Label(window, text=f"Balance: ${connection.getBalance(num)}", font=("Arial", 10),
                               justify=CENTER)
@@ -275,6 +278,8 @@ def displayTransactions(num, action):
     for t in transactions:
         tree.insert("", END, values=(t[0], t[1], f"{t[2]}", t[3], t[4]))
 
+    current_treeview = tree
+
     return tree
 
 
@@ -297,7 +302,7 @@ def addTransaction(num):
     new.title("New Transaction")
     new.geometry("425x225")
 
-    ttk.Label(new, text="Enter transaction data to add").grid(row=1, column=0, columnspan=2, ipadx=50, padx=10)
+    ttk.Label(new, text="Enter transaction data to add").grid(row=1, column=0, columnspan=2, padx=10)
 
     retailer_label = ttk.Label(new, text=f"Retailer")
     retailer_label.grid(row=2, column=0, pady=10)
@@ -347,33 +352,34 @@ def confirmEdit(num, trans_id, retailer, amount, dateT, pane):
         fail_text.grid(row=8, column=0, columnspan=2)
         return
 
-    connection.editTransaction(trans_id, retailer, amount, dateStr)
+
+    connection.editTransaction(trans_id, str(retailer), amount, dateStr)
     displayTransactions(num, "show")
     pane.destroy()
 
 
-def editTransaction(accountNumber, listbox):
-    global fail_text
+def editTransaction(accountNumber):
+    global fail_text, current_treeview
 
-    if fail_text:
+    treeview = current_treeview
+    if fail_text is not None and fail_text.winfo_exists():
         fail_text.grid_forget()
         fail_text = None
 
-    selection = listbox.selection()
+    selection = treeview.selection()
     if not selection:
         fail_text = ttk.Label(window, text="Please select a transaction to edit")
         fail_text.grid(row=7, column=0, columnspan=2, pady=5)
         return
 
-    values = listbox.item(selection[0], "values")
+    values = treeview.item(selection[0], "values")
     id = values[4]
 
     new = Toplevel(window)
     new.title("Edit Transaction")
-    new.geometry("275x275")
+    new.geometry("300x275")
 
-    Label(new, text="Enter new amount").grid(row=0, column=0, columnspan=2, ipadx=50)
-
+    ttk.Label(new, text="Enter new amount").grid(row=0, column=0, columnspan=2, ipadx=50)
     transaction = connection.getTransaction(id)
     if not transaction or accountNumber != transaction[2]:
         fail_text = ttk.Label(window, text="Unable to retrieve")
@@ -405,7 +411,6 @@ def editTransaction(accountNumber, listbox):
                      command=lambda: confirmEdit(accountNumber, id, retailerBox.get().strip(), amountBox.get().strip(),
                                                  dateBox.get().strip(), new))
     correct.grid(row=6, column=0, columnspan=2, pady=20)
-
 
 def chart_Transactions(num, action):
     action = action.lower()

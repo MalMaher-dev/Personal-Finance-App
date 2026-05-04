@@ -171,16 +171,32 @@ def sortTransactionsDate(num):
 def addTransaction(num, spent, seller, date):
     db = getConnection()
     mycursor = db.cursor()
-    mycursor.execute(f"INSERT INTO transactions (dateDone,accountNumber,amount,retailer)"
-                     f" VALUES ('{str(date)}',{num},{spent},'{str(seller)}')")
+    query = """
+            INSERT INTO transactions (dateDone,accountNumber,amount,retailer)
+            VALUES( %s, %s, %s, %s)
+    
+    """
+    values = (date, num, spent, seller)
+    mycursor.execute(query, values)
+    # mycursor.execute(f"INSERT INTO transactions (dateDone,accountNumber,amount,retailer)"
+    #                  f" VALUES ('{str(date)}',{num},{spent},'{str(seller)}')")
     mydb.commit()
 
 
 def editTransaction(transaction_id, retailer, amount, date):
     db = getConnection()
     mycursor = db.cursor()
-    mycursor.execute(
-        f"Update transactions SET retailer = '{retailer}', amount = {amount},dateDone = '{date}' WHERE transactionNumber = {transaction_id}")
+
+    query = """
+            UPDATE transactions
+            SET retailer = %s,amount   = %s, dateDone = %s
+            WHERE transactionNumber = %s """
+
+    values = (retailer, amount, date, transaction_id)
+
+    mycursor.execute(query, values)
+    # mycursor.execute(
+    #     f"Update transactions SET retailer = '{retailer}', amount = {amount},dateDone = '{date}' WHERE transactionNumber = {transaction_id}")
     mydb.commit()
 
 
