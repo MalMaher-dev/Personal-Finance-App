@@ -15,11 +15,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-DROP DATABASE IF EXISTS project;
-CREATE DATABASE project;
-
-USE project;
-
 --
 -- Table structure for table `accountinfo`
 --
@@ -45,7 +40,7 @@ CREATE TABLE `accountinfo` (
 
 LOCK TABLES `accountinfo` WRITE;
 /*!40000 ALTER TABLE `accountinfo` DISABLE KEYS */;
-INSERT INTO `accountinfo` VALUES ('Dayton','Dawson',0.00,1122,'dDawson','Daytond','2026-03-21 21:16:25'),('John','Smith',0.00,1234,'jSmith','JohnS','2026-03-21 20:57:37'),('Jane','Dow',199.99,9521,'jDow','JaneD','2026-03-21 20:57:37');
+INSERT INTO `accountinfo` VALUES ('Dayton','Dawson',0.00,1122,'dDawson','Daytond','2026-03-21 21:16:25'),('John','Smith',29.99,1234,'jSmith','JohnS','2026-03-21 20:57:37'),('Mallory','Maher',21.95,5676,'mMaher','MalloryM','2026-05-03 11:47:16'),('Jane','Dow',876.64,9521,'jDow','JaneD','2026-03-21 20:57:37');
 /*!40000 ALTER TABLE `accountinfo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -58,7 +53,7 @@ DROP TABLE IF EXISTS `transactions`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `transactions` (
   `dateCreated` datetime DEFAULT current_timestamp(),
-  `dateDone` varchar(255) NOT NULL,
+  `dateDone` date NOT NULL,
   `accountNumber` int(11) DEFAULT NULL,
   `transactionNumber` int(11) NOT NULL AUTO_INCREMENT,
   `amount` decimal(10,2) DEFAULT NULL,
@@ -66,7 +61,7 @@ CREATE TABLE `transactions` (
   PRIMARY KEY (`transactionNumber`),
   KEY `fk_accountNumber` (`accountNumber`),
   CONSTRAINT `fk_accountNumber` FOREIGN KEY (`accountNumber`) REFERENCES `accountinfo` (`accountNumber`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -75,7 +70,7 @@ CREATE TABLE `transactions` (
 
 LOCK TABLES `transactions` WRITE;
 /*!40000 ALTER TABLE `transactions` DISABLE KEYS */;
-INSERT INTO `transactions` VALUES ('2026-04-19 21:26:00','2021-12-25',9521,1,199.99,'Amazon');
+INSERT INTO `transactions` VALUES ('2026-04-19 21:26:00','2021-12-25',9521,1,199.99,'Amazon'),('2026-05-03 11:14:24','2000-08-19',9521,2,8.51,'Calvin Klein'),('2026-05-03 11:14:24','2006-10-26',9521,3,14.56,'Walmart'),('2026-05-03 11:14:24','2008-07-23',9521,4,69.94,'Aldi\'s'),('2026-05-03 11:17:04','2017-01-17',9521,5,10.91,'Calvin Klein'),('2026-05-03 11:17:04','2022-01-11',9521,6,59.47,'Aldi\'s'),('2026-05-03 11:17:04','2022-09-18',9521,7,23.93,'Amazon'),('2026-05-03 11:17:04','2004-07-09',9521,8,63.49,'Asda'),('2026-05-03 11:17:04','2019-12-25',9521,9,2.10,'Target'),('2026-05-03 11:17:04','2021-09-23',9521,10,38.78,'Costco'),('2026-05-03 11:17:04','2015-08-12',9521,11,2.50,'Amazon'),('2026-05-03 11:17:04','2003-07-11',9521,12,18.12,'Amazon'),('2026-05-03 11:17:04','2008-12-28',9521,13,6.73,'Calvin Klein'),('2026-05-03 11:17:04','2006-12-11',9521,14,20.83,'Amazon'),('2026-05-03 11:18:10','2013-03-01',9521,15,7.92,'Sam\'s Club'),('2026-05-03 11:18:10','2004-06-10',9521,16,13.78,'Aldi\'s'),('2026-05-03 11:18:10','2003-10-25',9521,17,61.42,'Walmart'),('2026-05-03 11:18:10','2020-11-16',9521,18,25.19,'Walmart'),('2026-05-03 11:18:10','2017-01-31',9521,19,48.62,'Costco'),('2026-05-03 11:18:10','2015-08-31',9521,20,27.27,'Target'),('2026-05-03 11:18:10','2024-01-02',9521,21,14.84,'Target'),('2026-05-03 11:18:10','2016-10-06',9521,22,46.52,'Amazon'),('2026-05-03 11:18:10','2022-01-25',9521,23,41.92,'Sam\'s Club'),('2026-05-03 11:18:10','2015-12-30',9521,24,49.30,'Target'),('2026-05-03 11:25:10','2015-01-22',1234,25,29.99,'Costco'),('2026-05-03 11:47:55','2023-02-13',5676,26,21.95,'Walmart');
 /*!40000 ALTER TABLE `transactions` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -148,9 +143,9 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
+
 CREATE USER 'guest'@'%' IDENTIFIED BY 'psssword';
 GRANT ALL PRIVILEGES ON project.* TO 'guest'@'%';
 FLUSH PRIVILEGES;
 
-
--- Dump completed on 2026-04-19 21:27:17
+-- Dump completed on 2026-05-04  9:46:07
