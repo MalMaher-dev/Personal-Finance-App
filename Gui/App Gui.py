@@ -430,7 +430,7 @@ def chart_Transactions(num, action):
         if plt.get_fignums():
             plt.close()
         plt.title("Money spent per retailer as a whole")
-        plt.pie(y, labels=x, autopct=lambda p: '{:.0f}'.format(p * sum(y) / 100))
+        plt.pie(y, labels=x, autopct=lambda p: '${:.2f}'.format(p * sum(y) / 100))
         plt.title(f"Money Spent as a whole: ${round(total, 2)}")
         plt.show()
     else:
@@ -441,7 +441,8 @@ def chart_Transactions(num, action):
         plt.ylabel("Money Spent ($)")
         plt.xlabel("Retailer")
         plt.title("Money Spent per Retailer")
-        plt.bar(x, y)
+        bars = plt.bar(x, y)
+        plt.bar_label(bars)
         plt.show()
 
 
