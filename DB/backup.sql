@@ -18,6 +18,12 @@
 --
 -- Table structure for table `accountinfo`
 --
+DROP DATABASE IF EXISTS project;
+CREATE DATABASE project;
+
+USE project;
+
+
 
 DROP TABLE IF EXISTS `accountinfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

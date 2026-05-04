@@ -9,11 +9,13 @@ from Objects import account as account
 import DB.connection as connection
 import random
 import numpy as np
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import textwrap
 import Objects.account as Account
 
-GEOMETRY_DEFAULT = "800x600"
+GEOMETRY_DEFAULT = "850x600"
 fail_text = None
 
 
@@ -54,6 +56,11 @@ window = Tk()
 
 window.title("Finance App")
 window.geometry(GEOMETRY_DEFAULT)
+window.configure(bg="#f5f5f5")
+style = ttk.Style()
+style.theme_use('alt')
+style.configure('TButton', background="#4CAF50", font=("Arial", 12))
+style.configure('TLabel', background="#f5f5f5", font=("Arial", 12))
 
 window.resizable(False, False)
 
@@ -91,13 +98,12 @@ def registration():
     lastName = Entry(window, width=25, justify=CENTER)
     lastName.pack()
 
-    NewSubmit_button = tkinter.Button(window, text="Submit",
+    NewSubmit_button = ttk.Button(window, text="Submit",
                                       command=lambda: submitNewUser(username.get(), password.get(),
                                                                     firstName.get(), lastName.get()))
     NewSubmit_button.pack()
 
-    loginOptionButton = tkinter.Button(window, text="If you already have an account", command=renderLoginScreen,
-                                       relief=tkinter.RIDGE, borderwidth=2)
+    loginOptionButton = ttk.Button(window, text="If you already have an account", command=renderLoginScreen)
     loginOptionButton.pack()
 
 
@@ -125,7 +131,7 @@ def renderLoginScreen():
     password = Entry(window, width=25, show='*', justify=CENTER)
     password.pack()
 
-    submit_button = Button(window, text="Submit", command=submit)
+    submit_button = ttk.Button(window, text="Submit", command=submit)
     submit_button.pack(pady=20)
 
 
@@ -155,12 +161,12 @@ def submit():
 def charter(num):
     new = Toplevel(window)
     new.title("Chart/Graph Options")
-    new.geometry("200x50")
+    new.geometry("325x50")
 
-    Pie_chart = Button(new, text="Pie Chart", font=("Arial", 10), command=lambda: chart_Transactions(num, "pie"))
+    Pie_chart = ttk.Button(new, text="Pie Chart", command=lambda: chart_Transactions(num, "pie"))
     Pie_chart.grid(row=2, column=0, columnspan=2, pady=10, padx=[25, 10])
 
-    Bar_graph = Button(new, text="Bar Graph", font=("Arial", 10), command=lambda: chart_Transactions(num, "bar"))
+    Bar_graph = ttk.Button(new, text="Bar Graph", command=lambda: chart_Transactions(num, "bar"))
     Bar_graph.grid(row=2, column=2, columnspan=2, pady=10, padx=10)
 
 
@@ -173,7 +179,8 @@ def renderHomeScreen(user):
     window.grid_columnconfigure(5, minsize=80)
     window.grid_columnconfigure(6, minsize=80)
 
-    user_label = ttk.Label(window, text=f"Hello {user.first_name},", font=("Arial", 20))
+    user_label = ttk.Label(window, text=f"Hello {user.first_name},", font=("Helvetica", 20, "bold"))
+                           # ttk.Label(window, text=f"Hello {user.first_name},", font=("Arial", 20))
     user_label.grid(row=0, column=0, columnspan=2, rowspan=2, ipadx=40, ipady=10, padx=30, pady=30)
 
     add_transaction = ttk.Button(window, text="Add Transaction", command=lambda: addTransaction(user.account_number))
@@ -198,7 +205,7 @@ def renderHomeScreen(user):
 
     refresh("show")
 
-    logOut = tkinter.Button(window, text="Logout", command=logout)
+    logOut = ttk.Button(window, text="Logout", command=logout)
     logOut.grid(row=13, column=6, columnspan=1, pady=10)
 
 
@@ -288,33 +295,33 @@ def confirmAdd(num, retailer, amount, dateStr, pane):
 def addTransaction(num):
     new = Toplevel(window)
     new.title("New Transaction")
-    new.geometry("275x275")
+    new.geometry("425x225")
 
-    Label(new, text="Enter transaction data to add").grid(row=0, column=0, columnspan=2, ipadx=50)
+    ttk.Label(new, text="Enter transaction data to add").grid(row=1, column=0, columnspan=2, ipadx=50, padx=10)
 
-    retailer_label = Label(new, text=f"Retailer", font=("Arial", 10))
-    retailer_label.grid(row=2, column=0, columnspan=2, pady=10, padx=50)
+    retailer_label = ttk.Label(new, text=f"Retailer")
+    retailer_label.grid(row=2, column=0, pady=10)
 
-    retailerBox = Entry(new, width=20, justify=CENTER)
-    retailerBox.grid(row=3, column=0, padx=60, pady=5)
+    retailerBox = Entry(new, width=20, justify="center")
+    retailerBox.grid(row=2, column=1, pady=10)
 
-    amount_label = Label(new, text="Amount", font=("Arial", 10))
-    amount_label.grid(row=4, column=0, columnspan=2, pady=10)
+    amount_label = ttk.Label(new, text="Amount")
+    amount_label.grid(row=3, column=0, pady=10)
 
-    amountBox = Entry(new, width=20, justify=CENTER)
-    amountBox.grid(row=5, column=0, padx=70, pady=5)
+    amountBox = Entry(new, width=20, justify="center")
+    amountBox.grid(row=3, column=1, pady=10)
 
-    Date_label = Label(new, text="Date (YYYY-MM-DD)", font=("Arial", 10))
-    Date_label.grid(row=6, column=0, columnspan=2, pady=10)
+    Date_label = ttk.Label(new, text="Date (YYYY-MM-DD)")
+    Date_label.grid(row=4, column=0, pady=10)
 
-    DateBox = Entry(new, width=20, justify=CENTER)
-    DateBox.grid(row=7, column=0, padx=80, pady=5)
+    DateBox = Entry(new, width=20, justify="center")
+    DateBox.grid(row=4, column=1, pady=10)
 
-    correct = Button(new, text="Submit",
+    correct = ttk.Button(new, text="Submit",
                      command=lambda: confirmAdd(num, retailerBox.get().strip(),
                                                 amountBox.get().strip(),
                                                 DateBox.get().strip(), new))
-    correct.grid(row=8, column=0, columnspan=2, pady=10)
+    correct.grid(row=5, column=0, columnspan=2, pady=10)
 
 
 global numberBox
@@ -373,28 +380,28 @@ def editTransaction(accountNumber, listbox):
         fail_text.grid(pady=20)
         return
     transData = f"{transaction[5]}, {transaction[4]}, {transaction[1]}"
-    data_label = Label(new, text=f"{transData}", font=("Arial", 10))
+    data_label = ttk.Label(new, text=f"{transData}", font=("Arial", 10))
     data_label.grid(row=2, column=0, columnspan=2, pady=20, padx=50)
 
-    retailer_label = Label(new, text="Retailer", font=("Arial", 10))
+    retailer_label = ttk.Label(new, text="Retailer", font=("Arial", 10))
     retailer_label.grid(row=3, column=0, pady=10)
 
     retailerBox = Entry(new, width=10)
     retailerBox.grid(row=3, column=1, ipadx=10)
 
-    amount_label = Label(new, text="Amount", font=("Arial", 10))
+    amount_label = ttk.Label(new, text="Amount", font=("Arial", 10))
     amount_label.grid(row=4, column=0, pady=10)
 
     amountBox = Entry(new, width=10)
     amountBox.grid(row=4, column=1, ipadx=10, padx=10)
 
-    date_label = Label(new, text="Date", font=("Arial", 10))
+    date_label = ttk.Label(new, text="Date", font=("Arial", 10))
     date_label.grid(row=5, column=0, pady=10)
 
     dateBox = Entry(new, width=10)
     dateBox.grid(row=5, column=1, ipadx=10)
 
-    correct = Button(new, text="Submit",
+    correct = ttk.Button(new, text="Submit",
                      command=lambda: confirmEdit(accountNumber, id, retailerBox.get().strip(), amountBox.get().strip(),
                                                  dateBox.get().strip(), new))
     correct.grid(row=6, column=0, columnspan=2, pady=20)
@@ -436,7 +443,6 @@ def chart_Transactions(num, action):
     else:
         if plt.get_fignums():
             plt.close()
-
         plt.figure(figsize=(7.5, 6))
         plt.ylabel("Money Spent ($)")
         plt.xlabel("Retailer")
