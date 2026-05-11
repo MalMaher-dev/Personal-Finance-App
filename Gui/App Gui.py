@@ -44,7 +44,7 @@ def submitNewUser(uName, pWord, fName, lName):
 
     if fail_text:
         fail_text.forget()
-    new_account = Account(fName, lName, uName, pWord, balance=0, account_id=account_id)
+    new_account = account.Account(fName, lName, uName, pWord, balance=0, account_id=account_id)
     connection.addAccount(new_account)
 
     for widget in window.winfo_children():
