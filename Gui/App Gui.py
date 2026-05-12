@@ -30,8 +30,26 @@ def getCurrentGeometry():
 def submitNewUser(uName, pWord, fName, lName):
     global fail_text
 
+    uName = uName.strip()
+    pWord = pWord.strip()
+    fName = fName.replace(" ", "").strip()
+    lName = lName.replace(" ", "").strip()
+
     account_id = random.randint(0, 9999)
     fields = [uName, pWord, fName, lName]
+
+    if connection.verifyAccount(uName, pWord) in (1, 2):
+        if fail_text:
+            fail_text.forget()
+        fail_text = ttk.Label(window, text="Invalid Username or Password")
+        fail_text.pack(pady=20)
+        return
+    if connection.verifyPassword(pWord):
+        if fail_text:
+            fail_text.forget()
+        fail_text = ttk.Label(window, text="Invalid Username or Password")
+        fail_text.pack(pady=20)
+        return
     if not connection.check_id(account_id):
         account_id += 1
     for field in fields:
@@ -41,6 +59,16 @@ def submitNewUser(uName, pWord, fName, lName):
             fail_text = ttk.Label(window, text="Fields cannot be empty")
             fail_text.pack(pady=20)
             return
+        elif field == fName or field == lName:
+            if field.isalpha():
+                pass
+            else:
+                if fail_text:
+                    fail_text.forget()
+                fail_text = ttk.Label(window, text="Incorrect Input type")
+                fail_text.pack(pady=20)
+                return
+
 
     if fail_text:
         fail_text.forget()
@@ -142,7 +170,7 @@ def submit():
         fail_text.pack_forget()
     uName = username.get().strip()
     pWord = password.get().strip()
-    if connection.verifyAccount(uName, pWord):
+    if connection.verifyAccount(uName, pWord) == 1:
         if fail_text is not None and fail_text.winfo_exists():
             fail_text.pack_forget()
         login_text.forget()
@@ -156,6 +184,9 @@ def submit():
         password.forget()
         submit_button.forget()
         renderHomeScreen(user)
+    elif connection.verifyAccount(uName, pWord) == 2:
+        fail_text = ttk.Label(window, text="Incorrect password")
+        fail_text.pack(pady=20)
     else:
         fail_text = ttk.Label(window, text="Incorrect username or password")
         fail_text.pack(pady=20)
@@ -284,15 +315,42 @@ def displayTransactions(num, action):
 
 
 def confirmAdd(num, retailer, amount, dateStr, pane):
-    dateStr = datetime.strptime(dateStr.strip(), "%Y-%m-%d").date()
-    retailer = retailer.strip()
-
-    if dateStr > date.today():
+    global fail_text
+    try:
+        dateStr = datetime.strptime(dateStr.strip(), "%Y-%m-%d").date()
+    except ValueError:
+        if fail_text:
+            fail_text.forget()
         fail_text = Label(pane, text="Please check the date")
         fail_text.grid(row=9, column=0, columnspan=2)
         return
 
-    connection.addTransaction(num, amount, retailer, dateStr)
+    retailer = retailer.strip()
+
+    if not retailer.replace("'", "").isalpha():
+        if fail_text:
+            fail_text.forget()
+        fail_text = Label(pane, text="Retailer can only be letters")
+        fail_text.grid(row=9, column=0, columnspan=2)
+        return
+
+    try:
+        amount = float(amount)
+    except ValueError:
+        if fail_text:
+            fail_text.forget()
+        fail_text = Label(pane, text="Amount must be a number")
+        fail_text.grid(row=9, column=0, columnspan=2)
+        return
+
+    if dateStr > date.today():
+        if fail_text:
+            fail_text.forget()
+        fail_text = Label(pane, text="Please check the date")
+        fail_text.grid(row=9, column=0, columnspan=2)
+        return
+
+    connection.addTransaction(num, float(amount), retailer, dateStr)
     displayTransactions(num, "show")
     pane.destroy()
 
@@ -333,10 +391,35 @@ global numberBox
 
 
 def confirmEdit(num, trans_id, retailer, amount, dateT, pane):
+    global fail_text
     amount = amount.strip()
     retailer = retailer.strip()
     dateT = dateT.strip()
     tran = connection.getTransaction(trans_id)
+
+    if fail_text is not None and fail_text.winfo_exists():
+        fail_text.grid_forget()
+
+    if retailer != "" and not retailer.replace("'", "").isalpha():
+        fail_text = Label(pane, text="Retailer can only be letters")
+        fail_text.grid(row=9, column=0, columnspan=2)
+        return
+
+    if amount != "":
+        try:
+            amount = float(amount)
+        except ValueError:
+            fail_text = Label(pane, text="Amount must be a number")
+            fail_text.grid(row=9, column=0, columnspan=2)
+            return
+
+    if dateT != "":
+        try:
+            dateT = datetime.strptime(dateT, "%Y-%m-%d").date()
+        except ValueError:
+            fail_text = Label(pane, text="Please check the date")
+            fail_text.grid(row=9, column=0, columnspan=2)
+            return
 
     if retailer == "":
         retailer = tran[5]
@@ -377,7 +460,7 @@ def editTransaction(accountNumber):
 
     new = Toplevel(window)
     new.title("Edit Transaction")
-    new.geometry("300x275")
+    new.geometry("300x300")
 
     ttk.Label(new, text="Enter new amount").grid(row=0, column=0, columnspan=2, ipadx=50)
     transaction = connection.getTransaction(id)

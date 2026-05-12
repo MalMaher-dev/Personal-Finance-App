@@ -12,7 +12,7 @@ from mysql.connector import Error
 def connectToMySQL():
     database = mysql.connector.connect(
         host="127.0.0.1",
-        port="3306",
+        port="3307",
         user="guest",
         password="psssword",
         database="project",
@@ -41,15 +41,23 @@ def CheckConnection():
 def verifyAccount(username, password):
     db = getConnection()
     mycursor = db.cursor()
-    mycursor.execute(f"SELECT * FROM accountinfo WHERE username='{username}';")
+    mycursor.execute(f"SELECT * FROM accountinfo WHERE BINARY username='{username}';")
     result = mycursor.fetchall()
-    if result == []:
-        return False
+    if result == []:  #Returns False if no account is found
+        return 0
     else:
-        if result[0][5] == password:
-            return True
+        if result[0][5] == password:  #Returns True if credentials match record
+            return 1
         else:
-            return False
+            return 2  #Returns False if the password is incorrect
+
+
+def verifyPassword(password):
+    db = getConnection()
+    mycursor = db.cursor()
+    mycursor.execute(f"SELECT * FROM accountinfo WHERE password='{password}';")
+    result = mycursor.fetchall()
+    return len(result) > 0
 
 
 def check_id(num):
@@ -223,7 +231,6 @@ def AccountautoGenTransactions(num):
     db = getConnection()
     mycursor = db.cursor()
     retailers = ["Amazon", "Calvin Klein", "Target", "Walmart", "Costco", "Sam's Club", "Aldi's", "Asda"]
-
 
     for x in range(10):
         Month = random.randint(1, 12)
